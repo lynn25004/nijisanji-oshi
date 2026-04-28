@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>彩虹社推し選擇器</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d0d14;
+      --bg2: #13131f;
+      --bg3: #1a1a2e;
+      --accent1: #ff6b9d;
+      --accent2: #c77dff;
+      --accent3: #48cae4;
+      --text: #e8e8f0;
+      --text2: #9999bb;
+      --card-bg: #1e1e30;
+      --card-border: #2e2e48;
+      --rainbow1: #ff6b6b;
+      --rainbow2: #ffa94d;
+      --rainbow3: #ffd43b;
+      --rainbow4: #69db7c;
+      --rainbow5: #4dabf7;
+      --rainbow6: #9775fa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans TC', 'Noto Sans JP', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    /* Rainbow top bar */
+    .rainbow-bar {
+      height: 4px;
+      background: linear-gradient(90deg,
+        var(--rainbow1), var(--rainbow2), var(--rainbow3),
+        var(--rainbow4), var(--rainbow5), var(--rainbow6));
+    }
+    /* Header */
+    .header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .header-logo {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .header-title { font-size: 20px; font-weight: 700; }
+    .header-subtitle { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .header-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .last-updated { font-size: 11px; color: var(--text2); }
+
+    /* Breadcrumb / back button */
+    .back-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 7px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .back-btn:hover { background: var(--card-border); }
+
+    /* Page 1: Member Select */
+    .page-container { padding: 20px; max-width: 1400px; margin: 0 auto; }
+
+    .filters {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-bottom: 20px; align-items: center;
+    }
+    .search-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 9px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      width: 220px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-box:focus { border-color: var(--accent2); }
+    .search-box::placeholder { color: var(--text2); }
+    .filter-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text2);
+      padding: 7px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .filter-btn.active {
+      color: #fff;
+      border-color: transparent;
+    }
+    .filter-btn.active.all    { background: linear-gradient(135deg, #ff6b9d, #c77dff); }
+    .filter-btn.active.JP     { background: linear-gradient(135deg, #ff6b6b, #ff8c42); }
+    .filter-btn.active.EN     { background: linear-gradient(135deg, #4dabf7, #2196F3); }
+    .filter-btn.active.KR     { background: linear-gradient(135deg, #ff80ab, #e91e63); }
+    .filter-btn.active.ID     { background: linear-gradient(135deg, #69db7c, #43a047); }
+    .filter-btn:not(.active):hover { border-color: var(--accent2); color: var(--text); }
+
+    .show-inactive-toggle {
+      margin-left: auto;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--text2); cursor: pointer;
+    }
+    .toggle-switch {
+      width: 32px; height: 18px;
+      background: var(--card-border);
+      border-radius: 9px;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .toggle-switch.on { background: var(--accent2); }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 12px; height: 12px;
+      background: white;
+      border-radius: 50%;
+      transition: left 0.2s;
+    }
+    .toggle-switch.on::after { left: 17px; }
+
+    .result-count { font-size: 12px; color: var(--text2); width: 100%; }
+
+    /* Member Grid */
+    .member-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    @media (max-width: 480px) {
+      .member-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+    }
+
+    .member-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 10px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      text-align: center;
+      user-select: none;
+    }
+    .member-card:hover {
+      border-color: var(--accent2);
+      transform: translateY(-2px);
+      background: #222234;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .member-card.inactive { opacity: 0.45; }
+    .member-card.inactive:hover { opacity: 0.65; }
+
+    .member-avatar {
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--card-border);
+      flex-shrink: 0;
+      background: var(--bg3);
+    }
+    .avatar-fallback {
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 700;
+      flex-shrink: 0;
+      color: white;
+      border: 2px solid rgba(255,255,255,0.15);
+    }
+    .member-name {
+      font-size: 12px; font-weight: 600; line-height: 1.3;
+      max-width: 100%; word-break: break-word;
+    }
+    .member-name-en {
+      font-size: 10px; color: var(--text2);
+      max-width: 100%; word-break: break-word;
+    }
+    .member-debut { font-size: 10px; color: var(--text2); }
+
+    .branch-tag {
+      position: absolute; top: 6px; right: 6px;
+      font-size: 9px; font-weight: 700; padding: 2px 5px;
+      border-radius: 4px; letter-spacing: 0.5px;
+    }
+    .branch-JP { background: rgba(255,107,107,0.3); color: #ff6b6b; }
+    .branch-EN { background: rgba(77,171,247,0.3); color: #4dabf7; }
+    .branch-KR { background: rgba(255,128,171,0.3); color: #ff80ab; }
+    .branch-ID { background: rgba(105,219,124,0.3); color: #69db7c; }
+
+    .inactive-badge {
+      position: absolute; top: 6px; left: 6px;
+      font-size: 9px; background: rgba(150,150,150,0.3);
+      color: #aaa; padding: 2px 5px; border-radius: 4px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--text2);
+      grid-column: 1/-1;
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* Loading */
+    .loading-spinner {
+      display: flex; justify-content: center; align-items: center;
+      padding: 80px; grid-column: 1/-1;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--card-border);
+      border-top-color: var(--accent2);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== PAGE 2: MERCH ===== */
+    .oshi-hero {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 24px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .oshi-hero-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 3px solid transparent;
+      background-clip: padding-box;
+    }
+    .oshi-hero-avatar-wrap {
+      width: 86px; height: 86px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3));
+      flex-shrink: 0;
+    }
+    .oshi-hero-avatar-inner {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+    .oshi-hero-info { flex: 1; min-width: 0; }
+    .oshi-hero-name { font-size: 22px; font-weight: 700; }
+    .oshi-hero-name-en { font-size: 14px; color: var(--text2); margin-top: 2px; }
+    .oshi-hero-meta { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+    .hero-tag {
+      font-size: 11px; padding: 3px 10px;
+      border-radius: 20px; background: var(--card-bg);
+      border: 1px solid var(--card-border);
+    }
+
+    .channel-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #FF0000;
+      color: white; padding: 8px 16px;
+      border-radius: 20px; font-size: 13px;
+      text-decoration: none; flex-shrink: 0;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .channel-btn:hover { opacity: 0.85; }
+
+    .section-title {
+      font-size: 18px; font-weight: 700;
+      padding: 20px 20px 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .merch-count {
+      font-size: 12px; color: var(--text2);
+      background: var(--card-bg);
+      padding: 3px 10px; border-radius: 20px;
+      border: 1px solid var(--card-border);
+    }
+
+    /* Merch grid */
+    .merch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+      padding: 0 20px 30px;
+    }
+    @media (max-width: 480px) {
+      .merch-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; }
+    }
+
+    .merch-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+    }
+    .merch-card:hover {
+      border-color: var(--accent2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .merch-img-wrap {
+      aspect-ratio: 1;
+      background: #111118;
+      overflow: hidden;
+    }
+    .merch-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .merch-card:hover .merch-img-wrap img { transform: scale(1.05); }
+    .merch-info { padding: 10px 12px 14px; }
+    .merch-title {
+      font-size: 12px; line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .merch-price { font-size: 14px; font-weight: 700; margin-top: 6px; color: var(--accent1); }
+    .merch-avail {
+      font-size: 10px; margin-top: 4px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .avail-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .avail-dot.in { background: #69db7c; }
+    .avail-dot.out { background: #ff6b6b; }
+
+    .no-merch {
+      text-align: center; padding: 60px 20px; color: var(--text2);
+    }
+    .no-merch .icon { font-size: 48px; margin-bottom: 12px; }
+
+    .merch-loading { text-align: center; padding: 40px; color: var(--text2); }
+
+    .merch-error {
+      margin: 0 20px 20px;
+      padding: 14px 18px;
+      background: rgba(255,100,100,0.1);
+      border: 1px solid rgba(255,100,100,0.3);
+      border-radius: 10px;
+      font-size: 13px; color: #ff9999;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
+
+    /* Responsive header */
+    @media (max-width: 600px) {
+      .header-subtitle { display: none; }
+      .oshi-hero { flex-wrap: wrap; }
+      .channel-btn { order: 3; }
+    }
+  </style>
+</head>
+<body>
+  <div class="rainbow-bar"></div>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useMemo } = React;
+
+    /* ── helpers ── */
+    function getBranchLabel(branch) {
+      const map = { JP: '🇯🇵 JP', EN: '🌍 EN', KR: '🇰🇷 KR', ID: '🇮🇩 ID' };
+      return map[branch] || branch;
+    }
+    function formatDate(d) {
+      if (!d) return '';
+      const [y,m,day] = d.split('-');
+      return `${y}年${parseInt(m)}月${parseInt(day)}日`;
+    }
+    function getInitials(name) {
+      if (!name) return '?';
+      // Japanese name: take first char
+      const enMatch = name.match(/^[A-Za-z]/);
+      if (enMatch) return name.slice(0,2).toUpperCase();
+      return name.slice(0,1);
+    }
+    function hashColor(str, baseColor) {
+      if (baseColor) return baseColor;
+      let h = 0;
+      for (let i=0; i<str.length; i++) h = (h*31 + str.charCodeAt(i)) & 0xFFFFFF;
+      return '#' + ('000000' + h.toString(16)).slice(-6);
+    }
+    function lighten(hex, amt=0.3) {
+      const n = parseInt(hex.slice(1),16);
+      const r = Math.min(255, (n>>16) + Math.round(255*amt));
+      const g = Math.min(255, ((n>>8)&0xFF) + Math.round(255*amt));
+      const b = Math.min(255, (n&0xFF) + Math.round(255*amt));
+      return `rgb(${r},${g},${b})`;
+    }
+
+    /* ── Avatar component ── */
+    function Avatar({ member, size=70 }) {
+      const [imgFailed, setImgFailed] = useState(false);
+      const color = member.color || hashColor(member.id, null);
+      const initials = getInitials(member.name || member.nameEn);
+
+      if (!member.image || imgFailed) {
+        return (
+          <div className="avatar-fallback" style={{
+            width: size, height: size,
+            background: `linear-gradient(135deg, ${color}, ${lighten(color)})`,
+            fontSize: size * 0.3,
+          }}>
+            {initials}
+          </div>
+        );
+      }
+      return (
+        <img
+          className="member-avatar"
+          src={member.image}
+          alt={member.nameEn || member.name}
+          width={size} height={size}
+          onError={() => setImgFailed(true)}
+          style={{ width: size, height: size }}
+        />
+      );
+    }
+
+    /* ── OshiHero ── */
+    function OshiHero({ member }) {
+      const color = member.color || '#9775fa';
+      return (
+        <div className="oshi-hero">
+          <div className="oshi-hero-avatar-wrap" style={{
+            background: `linear-gradient(135deg, ${color}, ${lighten(color)})`,
+          }}>
+            <div className="oshi-hero-avatar-inner">
+              <Avatar member={member} size={80} />
+            </div>
+          </div>
+          <div className="oshi-hero-info">
+            <div className="oshi-hero-name">{member.name}</div>
+            <div className="oshi-hero-name-en">{member.nameEn}</div>
+            <div className="oshi-hero-meta">
+              <span className="hero-tag">{getBranchLabel(member.branch)}</span>
+              {member.debutDate && (
+                <span className="hero-tag">📅 出道 {formatDate(member.debutDate)}</span>
+              )}
+              {!member.active && <span className="hero-tag" style={{color:'#ff9999'}}>⭐ 已畢業</span>}
+            </div>
+          </div>
+          {member.channelUrl && (
+            <a href={member.channelUrl} target="_blank" rel="noreferrer" className="channel-btn">
+              ▶ YouTube 頻道
+            </a>
+          )}
+        </div>
+      );
+    }
+
+    /* ── MerchCard ── */
+    function MerchCard({ product }) {
+      const img = product.images?.[0]?.src || '';
+      const variant = product.variants?.[0];
+      const price = variant ? parseFloat(variant.price) : 0;
+      const available = product.variants?.some(v => v.available !== false);
+      const shopUrl = `https://nijisanji-store.com/products/${product.handle}`;
+
+      return (
+        <a className="merch-card" href={shopUrl} target="_blank" rel="noreferrer">
+          <div className="merch-img-wrap">
+            {img ? <img src={img} alt={product.title} loading="lazy" /> :
+              <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',color:'#444',fontSize:40}}>🛍</div>}
+          </div>
+          <div className="merch-info">
+            <div className="merch-title">{product.title}</div>
+            <div className="merch-price">${price.toFixed(0)}</div>
+            <div className="merch-avail">
+              <div className={`avail-dot ${available ? 'in' : 'out'}`}></div>
+              <span style={{color: available ? '#69db7c' : '#ff6b6b', fontSize:10}}>
+                {available ? '有庫存' : '缺貨'}
+              </span>
+            </div>
+          </div>
+        </a>
+      );
+    }
+
+    /* ── Page2: MerchPage ── */
+    function MerchPage({ member, onBack }) {
+      const [products, setProducts] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState('');
+      const [showAll, setShowAll] = useState(false);
+
+      const searchNames = useMemo(() => {
+        const names = new Set();
+        if (member.nameEn) {
+          names.add(member.nameEn.toLowerCase());
+          // Also add first name only for EN
+          const parts = member.nameEn.split(' ');
+          if (parts.length > 1) names.add(parts[0].toLowerCase());
+        }
+        if (member.name) names.add(member.name);
+        return [...names];
+      }, [member]);
+
+      useEffect(() => {
+        async function fetchMerch() {
+          setLoading(true);
+          setError('');
+          try {
+            let allProducts = [];
+            let page = 1;
+            while (true) {
+              const res = await fetch(
+                `https://nijisanji-store.com/products.json?limit=250&page=${page}`
+              );
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const data = await res.json();
+              if (!data.products || data.products.length === 0) break;
+              allProducts = allProducts.concat(data.products);
+              if (data.products.length < 250) break;
+              page++;
+            }
+            setProducts(allProducts);
+          } catch (e) {
+            setError(e.message || '無法載入商品資料');
+          }
+          setLoading(false);
+        }
+        fetchMerch();
+      }, [member.id]);
+
+      // Filter products matching this member
+      const matchedProducts = useMemo(() => {
+        return products.filter(p => {
+          const title = p.title.toLowerCase();
+          const tags = (p.tags || '').toLowerCase();
+          return searchNames.some(n => title.includes(n) || tags.includes(n));
+        });
+      }, [products, searchNames]);
+
+      const displayProducts = showAll
+        ? matchedProducts
+        : matchedProducts.filter(p => p.variants?.some(v => v.available !== false));
+
+      const outOfStock = matchedProducts.filter(
+        p => !p.variants?.some(v => v.available !== false)
+      );
+
+      return (
+        <div>
+          <OshiHero member={member} />
+
+          {error && (
+            <div className="merch-error">
+              ⚠️ 無法連接商店 API：{error}。
+              請確認網路連線，或
+              <a href="https://nijisanji-store.com" target="_blank" rel="noreferrer"
+                 style={{color:'#ff9999',marginLeft:4}}>直接前往商店</a>搜尋。
+            </div>
+          )}
+
+          <div className="section-title">
+            🛍️ 在架商品
+            {!loading && (
+              <span className="merch-count">{displayProducts.length} 件</span>
+            )}
+            {!loading && outOfStock.length > 0 && (
+              <label style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:6,fontSize:12,color:'var(--text2)',cursor:'pointer',fontWeight:400}}>
+                <span
+                  className={`toggle-switch ${showAll ? 'on' : ''}`}
+                  onClick={() => setShowAll(s => !s)}
+                ></span>
+                顯示缺貨商品 ({outOfStock.length})
+              </label>
+            )}
+          </div>
+
+          {loading ? (
+            <div className="merch-loading">
+              <div className="spinner" style={{margin:'0 auto 10px'}}></div>
+              <div>正在從官方商店載入商品資料…</div>
+            </div>
+          ) : displayProducts.length === 0 && !error ? (
+            <div className="no-merch">
+              <div className="icon">🔍</div>
+              <div style={{fontSize:16,fontWeight:600,marginBottom:8}}>
+                {matchedProducts.length > 0 ? '目前商品均已缺貨' : '目前商店尚無此成員的商品'}
+              </div>
+              <div style={{fontSize:13}}>
+                可直接前往
+                <a href="https://nijisanji-store.com" target="_blank" rel="noreferrer"
+                   style={{color:'var(--accent3)',margin:'0 4px'}}>nijisanji-store.com</a>
+                查看完整商品列表
+              </div>
+              {matchedProducts.length > 0 && (
+                <button
+                  onClick={() => setShowAll(true)}
+                  style={{marginTop:14,background:'var(--card-bg)',border:'1px solid var(--card-border)',
+                    color:'var(--text)',padding:'8px 20px',borderRadius:20,cursor:'pointer',fontSize:13}}
+                >
+                  顯示全部 {matchedProducts.length} 件商品（含缺貨）
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="merch-grid">
+              {displayProducts.map(p => <MerchCard key={p.id} product={p} />)}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* ── Page1: MemberSelect ── */
+    function MemberSelect({ members, lastUpdated, onSelect }) {
+      const [search, setSearch] = useState('');
+      const [branch, setBranch] = useState('all');
+      const [showInactive, setShowInactive] = useState(false);
+
+      const branches = useMemo(() => {
+        const s = new Set(members.map(m => m.branch));
+        return [...s].sort();
+      }, [members]);
+
+      const filtered = useMemo(() => {
+        let list = members;
+        if (!showInactive) list = list.filter(m => m.active !== false);
+        if (branch !== 'all') list = list.filter(m => m.branch === branch);
+        if (search.trim()) {
+          const q = search.trim().toLowerCase();
+          list = list.filter(m =>
+            m.name?.toLowerCase().includes(q) ||
+            m.nameEn?.toLowerCase().includes(q)
+          );
+        }
+        return list;
+      }, [members, branch, search, showInactive]);
+
+      return (
+        <div className="page-container">
+          <div style={{marginBottom:16,marginTop:4}}>
+            <h1 style={{fontSize:24,fontWeight:700,marginBottom:4}}>選擇你的推し 💜</h1>
+            <p style={{color:'var(--text2)',fontSize:13}}>
+              按出道日期排列 · 共 {members.filter(m=>m.active!==false).length} 位活躍成員
+              {lastUpdated && <span>· 資料更新：{lastUpdated}</span>}
+            </p>
+          </div>
+
+          <div className="filters">
+            <input
+              className="search-box"
+              placeholder="🔍 搜尋成員名稱…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+            <button
+              className={`filter-btn ${branch === 'all' ? 'active all' : ''}`}
+              onClick={() => setBranch('all')}
+            >全部分部</button>
+            {branches.map(b => (
+              <button
+                key={b}
+                className={`filter-btn ${branch === b ? `active ${b}` : ''}`}
+                onClick={() => setBranch(b)}
+              >{getBranchLabel(b)}</button>
+            ))}
+            <label className="show-inactive-toggle" onClick={() => setShowInactive(s => !s)}>
+              <span className={`toggle-switch ${showInactive ? 'on' : ''}`}></span>
+              顯示已畢業
+            </label>
+          </div>
+
+          <div className="result-count" style={{marginBottom:12}}>
+            找到 {filtered.length} 位成員
+          </div>
+
+          <div className="member-grid">
+            {filtered.length === 0 ? (
+              <div className="empty-state">
+                <div className="icon">🌈</div>
+                <div>找不到符合的成員</div>
+              </div>
+            ) : filtered.map(m => (
+              <div
+                key={m.id}
+                className={`member-card ${m.active === false ? 'inactive' : ''}`}
+                onClick={() => onSelect(m)}
+              >
+                <span className={`branch-tag branch-${m.branch}`}>{m.branch}</span>
+                {m.active === false && <span className="inactive-badge">畢業</span>}
+                <Avatar member={m} size={70} />
+                <div className="member-name">{m.name}</div>
+                {m.nameEn && m.nameEn !== m.name && (
+                  <div className="member-name-en">{m.nameEn}</div>
+                )}
+                {m.debutDate && (
+                  <div className="member-debut">{m.debutDate.slice(0,7)}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    /* ── Main App ── */
+    function App() {
+      const [members, setMembers] = useState([]);
+      const [lastUpdated, setLastUpdated] = useState('');
+      const [loading, setLoading] = useState(true);
+      const [selectedMember, setSelectedMember] = useState(null);
+
+      useEffect(() => {
+        fetch('./data/members.json')
+          .then(r => r.json())
+          .then(data => {
+            const sorted = [...(data.members || [])].sort((a, b) => {
+              if (!a.debutDate) return 1;
+              if (!b.debutDate) return -1;
+              return a.debutDate.localeCompare(b.debutDate);
+            });
+            setMembers(sorted);
+            setLastUpdated(data.lastUpdated || '');
+          })
+          .catch(e => {
+            console.error('Failed to load members:', e);
+            setMembers([]);
+          })
+          .finally(() => setLoading(false));
+      }, []);
+
+      if (loading) {
+        return (
+          <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'80vh'}}>
+            <div className="spinner"></div>
+          </div>
+        );
+      }
+
+      return (
+        <div>
+          <div className="header">
+            <div className="header-logo">🌈</div>
+            <div>
+              <div className="header-title">彩虹社推し選擇器</div>
+              <div className="header-subtitle">NIJISANJI Oshi Picker</div>
+            </div>
+            <div className="header-right">
+              {selectedMember && (
+                <button className="back-btn" onClick={() => setSelectedMember(null)}>
+                  ← 返回成員列表
+                </button>
+              )}
+            </div>
+          </div>
+
+          {selectedMember ? (
+            <MerchPage member={selectedMember} onBack={() => setSelectedMember(null)} />
+          ) : (
+            <MemberSelect
+              members={members}
+              lastUpdated={lastUpdated}
+              onSelect={setSelectedMember}
+            />
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
