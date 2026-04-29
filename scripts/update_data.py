@@ -105,10 +105,15 @@ def merge(existing_list, scraped_list):
             print(f"  + New: {s.get('nameEn') or s.get('name')}")
             merged.append(s)
 
-    # Preserve graduated members not on site anymore
+    # 不在 scraped 裡的成員 → 視為已畢業，自動標 active=False 並保留
     for mid, m in existing_map.items():
-        if mid not in seen and m.get("active") is False:
+        if mid in seen:
+            continue
+        if m.get("active") is False:
             merged.append(m)
+        else:
+            print(f"  - Graduated: {m.get('nameEn') or m.get('name')}")
+            merged.append({**m, "active": False})
 
     merged.sort(key=lambda m: (m.get("debutDate") or "9999-99-99"))
     return merged

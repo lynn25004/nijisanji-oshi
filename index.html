@@ -116,11 +116,11 @@ const {useState,useEffect,useCallback,useMemo,useRef}=React;
 
 const STORE='https://nijisanji-store.com';
 // Multiple CORS proxy options - tries each in order
+// 直連是主路（Shopify 有 access-control-allow-origin: *），proxy 只是保險
+// 2026-04-29 實測：corsproxy.io 403 / allorigins 卡死 / codetabs timeout，全砍
 const PROXIES=[
-  url=>url, // direct (works if store allows CORS)
-  url=>`https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-  url=>`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-  url=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+  url=>url, // direct (Shopify allows CORS)
+  url=>`https://api.cors.lol/?url=${encodeURIComponent(url)}`,
 ];
 const CACHE_TTL=30*60*1000; // 30 minutes
 let _cache={data:null,ts:0,prom:null};
