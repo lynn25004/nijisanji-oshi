@@ -233,8 +233,10 @@ function MerchPage({member}){
   const matched=useMemo(()=>{
     if(!prods) return[];
     return prods.filter(p=>{
-      const title=p.title.toLowerCase();
-      const tags=(p.tags||'').toLowerCase();
+      const title=(p.title||'').toLowerCase();
+      // tags 可能是 string（"a, b, c"）或 array（["a","b","c"]）
+      const tagsRaw=p.tags;
+      const tags=Array.isArray(tagsRaw)?tagsRaw.join(' ').toLowerCase():(typeof tagsRaw==='string'?tagsRaw.toLowerCase():'');
       return keys.some(k=>title.includes(k)||tags.includes(k));
     });
   },[prods,keys]);
