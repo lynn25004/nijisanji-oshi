@@ -1,10 +1,15 @@
-name: 每日更新彩虹社成員資料
+name: 每日更新彩虹社成員＋商品資料
 
 on:
   schedule:
     # 每天台灣時間早上 8:00 執行 (UTC 00:00)
     - cron: "0 0 * * *"
   workflow_dispatch:  # 可手動觸發
+
+# 商品索引建表會跑 5-15 分鐘，避免並發
+concurrency:
+  group: update-data
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -21,15 +26,19 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: 執行更新腳本
-        run: python scripts/update_data.py
+      - name: 更新成員資料
+        run: python -u scripts/update_data.py
+
+      - name: 更新商品索引（shop.nijisanji.jp）
+        run: python -u scripts/build_products.py
+        timeout-minutes: 30
 
       - name: 提交更新資料
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Actions"
-          git add data/members.json
-          git diff --staged --quiet || git commit -m "自動更新成員資料 $(date '+%Y-%m-%d')"
+          git add data/members.json data/products.json
+          git diff --staged --quiet || git commit -m "自動更新成員＋商品資料 $(date '+%Y-%m-%d')"
 
       - name: 推送
         uses: ad-m/github-push-action@master

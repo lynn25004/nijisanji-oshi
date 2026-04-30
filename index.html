@@ -114,47 +114,18 @@
 <script type="text/babel">
 const {useState,useEffect,useCallback,useMemo,useRef}=React;
 
-const STORE='https://nijisanji-store.com';
-// Multiple CORS proxy options - tries each in order
-// 直連是主路（Shopify 有 access-control-allow-origin: *），proxy 只是保險
-// 2026-04-29 實測：corsproxy.io 403 / allorigins 卡死 / codetabs timeout，全砍
-const PROXIES=[
-  url=>url, // direct (Shopify allows CORS)
-  url=>`https://cors.eu.org/${url}`,
-  url=>`https://api.cors.lol/?url=${encodeURIComponent(url)}`,
-];
-const CACHE_TTL=30*60*1000; // 30 minutes
-let _cache={data:null,ts:0,prom:null};
+const STORE='https://shop.nijisanji.jp';
+// 商品資料由 GitHub Actions 預先抓 shop.nijisanji.jp 全部商品 → data/products.json
+// 前端只 fetch 這個靜態檔，沒有 CORS / proxy 問題，比對也精準（用真實 ライバー 名單）
+let _productsCache=null;
 
-async function tryFetch(url){
-  for(const proxy of PROXIES){
-    try{
-      const ctrl=new AbortController();
-      const t=setTimeout(()=>ctrl.abort(),8000);
-      const r=await fetch(proxy(url),{signal:ctrl.signal});
-      clearTimeout(t);
-      if(r.ok){const d=await r.json();return d;}
-    }catch(e){continue;}
-  }
-  throw new Error('所有連線方式均失敗，請稍後再試');
-}
-
-async function loadProducts(forceRefresh=false){
-  const now=Date.now();
-  if(!forceRefresh&&_cache.data&&(now-_cache.ts)<CACHE_TTL) return _cache.data;
-  if(!forceRefresh&&_cache.prom) return _cache.prom;
-  _cache.prom=(async()=>{
-    const all=[];
-    for(let page=1;page<=20;page++){
-      const data=await tryFetch(`${STORE}/products.json?limit=250&page=${page}`);
-      if(!data.products?.length) break;
-      all.push(...data.products);
-      if(data.products.length<250) break;
-    }
-    _cache={data:all,ts:Date.now(),prom:null};
-    return all;
-  })();
-  return _cache.prom;
+async function loadProducts(){
+  if(_productsCache) return _productsCache;
+  const r=await fetch('./data/products.json');
+  if(!r.ok) throw new Error(`products.json 載入失敗 (${r.status})`);
+  const d=await r.json();
+  _productsCache={products:d.products||[],lastUpdated:d.lastUpdated||''};
+  return _productsCache;
 }
 
 function bl(b){return{JP:'🇯🇵 JP',EN:'🌍 EN',VR:'🌐 VR'}[b]||b}
@@ -172,80 +143,40 @@ function Avatar({member,size=64}){
 }
 
 function MerchCard({p}){
-  const img=p.images?.[0]?.src||'';
-  const price=parseFloat(p.variants?.[0]?.price||0);
-  const avail=p.variants?.some(v=>v.available!==false);
   return(
-    <a className="merch-card" href={`${STORE}/products/${p.handle}`} target="_blank" rel="noreferrer">
+    <a className="merch-card" href={p.url} target="_blank" rel="noreferrer">
       <div className="merch-img">
-        {img?<img src={img} alt={p.title} loading="lazy"/>
+        {p.image?<img src={p.image} alt={p.title} loading="lazy"/>
           :<div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',color:'#444',fontSize:36}}>🛍</div>}
       </div>
       <div className="merch-info">
         <div className="merch-title">{p.title}</div>
-        <div className="merch-price">¥{price.toFixed(0)}</div>
-        <div className="merch-avail">
-          <div className={`avail-dot ${avail?'in':'out'}`}></div>
-          <span style={{color:avail?'#69db7c':'#ff6b6b',fontSize:10}}>{avail?'有庫存':'缺貨'}</span>
-        </div>
+        {p.price&&<div className="merch-price">¥{p.price.toLocaleString()}</div>}
+        {p.talents&&p.talents.length>1&&(
+          <div style={{fontSize:10,color:'var(--text2)',marginTop:3}}>含 {p.talents.length} 位ライバー</div>
+        )}
       </div>
     </a>
   );
 }
 
 function MerchPage({member}){
-  const[prods,setProds]=useState(null);
+  const[data,setData]=useState(null);
   const[err,setErr]=useState('');
-  const[status,setStatus]=useState('');
-  const[showAll,setShowAll]=useState(false);
-  const[refreshKey,setRefreshKey]=useState(0);
 
-  // Build search keys from member data
-  const keys=useMemo(()=>{
-    const s=new Set();
-    if(member.nameEn){
-      const en=member.nameEn.toLowerCase();
-      s.add(en);
-      // Add each part (first name, last name)
-      member.nameEn.split(/\s+/).forEach(p=>{if(p.length>1)s.add(p.toLowerCase());});
-    }
-    if(member.name) s.add(member.name);
-    // member id slug, e.g. "kuzuha" → "kuzuha"
-    if(member.id){
-      const slug=member.id.replace(/-/g,' ').toLowerCase();
-      s.add(slug);
-      s.add(member.id.toLowerCase());
-    }
-    return[...s].filter(k=>k.length>1);
-  },[member]);
-
-  const doLoad=useCallback((force=false)=>{
-    setProds(null);setErr('');
-    setStatus(force?'重新整理中…':'載入商品中…');
-    if(force) _cache={data:null,ts:0,prom:null}; // bust cache
-    loadProducts(force)
-      .then(a=>{setProds(a);setStatus(`共 ${a.length} 件商品・${new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})} 更新`);})
-      .catch(e=>{setErr(e.message);setProds([]);setStatus('');});
+  useEffect(()=>{
+    setErr('');
+    loadProducts().then(setData).catch(e=>setErr(e.message));
   },[]);
 
-  useEffect(()=>{doLoad(false);},[member.id,refreshKey]);
-
   const matched=useMemo(()=>{
-    if(!prods) return[];
-    return prods.filter(p=>{
-      const title=(p.title||'').toLowerCase();
-      // tags 可能是 string（"a, b, c"）或 array（["a","b","c"]）
-      const tagsRaw=p.tags;
-      const tags=Array.isArray(tagsRaw)?tagsRaw.join(' ').toLowerCase():(typeof tagsRaw==='string'?tagsRaw.toLowerCase():'');
-      return keys.some(k=>title.includes(k)||tags.includes(k));
-    });
-  },[prods,keys]);
+    if(!data||!member.name) return[];
+    // 用 talents 陣列精準比對（不再靠字串猜）
+    return data.products.filter(p=>(p.talents||[]).includes(member.name));
+  },[data,member]);
 
-  const inStock=matched.filter(p=>p.variants?.some(v=>v.available!==false));
-  const outStock=matched.filter(p=>!p.variants?.some(v=>v.available!==false));
-  const display=showAll?matched:inStock;
   const c=member.color||hc(member.id||'x');
-  const searchQ=encodeURIComponent(member.nameEn||member.name||'');
+  const searchQ=encodeURIComponent(member.name||member.nameEn||'');
 
   return(
     <div>
@@ -264,68 +195,47 @@ function MerchPage({member}){
         </div>
       </div>
 
-      {/* Store links */}
       <div className="store-links">
-        <a className="store-link-btn" href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer">🛒 在官方商店搜尋</a>
+        <a className="store-link-btn" href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer">🛒 shop.nijisanji.jp 搜尋</a>
         {member.channelUrl&&<a className="store-link-btn" href={member.channelUrl} target="_blank" rel="noreferrer">▶ YouTube</a>}
       </div>
 
       {err&&(
         <div className="merch-error">
-          ⚠️ 無法載入商品：{err}<br/>
-          <span style={{fontSize:11}}>請稍後再試，或直接
-            <a href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer" style={{color:'#ffb3b3',marginLeft:4}}>前往商店手動搜尋</a>
+          ⚠️ 無法載入商品索引：{err}<br/>
+          <span style={{fontSize:11}}>請重新整理頁面，或直接
+            <a href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer" style={{color:'#ffb3b3',marginLeft:4}}>前往 shop.nijisanji.jp 搜尋</a>
           </span>
-        </div>
-      )}
-
-      {member.branch!=='EN'&&prods!==null&&matched.length===0&&!err&&(
-        <div className="merch-notice">
-          💡 <strong>nijisanji-store.com</strong> 主要販售 EN 分部商品。JP / VR 成員的周邊通常在日本或中國站購買，可點上方「在官方商店搜尋」看看是否有相關品項。
         </div>
       )}
 
       <div className="section-hdr">
         🛍️ 相關商品
-        {prods!==null&&<span className="count-badge">{display.length} 件</span>}
-        {prods!==null&&outStock.length>0&&(
-          <label className="toggle-label">
-            <span className={`toggle-sw ${showAll?'on':''}`} onClick={()=>setShowAll(s=>!s)}></span>
-            含缺貨 ({outStock.length})
-          </label>
-        )}
-        <button className="refresh-btn" onClick={()=>doLoad(true)} style={{marginLeft:'auto'}}>🔄 重新整理</button>
+        {data&&<span className="count-badge">{matched.length} 件</span>}
+        {data&&<span style={{fontSize:11,color:'var(--text2)',marginLeft:'auto'}}>索引更新：{data.lastUpdated}</span>}
       </div>
 
-      {status&&<div className="fetch-status">{status}</div>}
-
-      {prods===null&&!err&&(
+      {!data&&!err&&(
         <div className="merch-loading">
           <div className="spinner"></div>
-          <div>正在連接官方商店…</div>
-          <div style={{fontSize:11,marginTop:6,color:'var(--text2)'}}>首次載入需要幾秒，之後切換成員會即時顯示</div>
+          <div>載入商品索引中…</div>
         </div>
       )}
 
-      {prods!==null&&display.length===0&&!err&&(
+      {data&&matched.length===0&&!err&&(
         <div className="no-merch">
           <div className="icon">🔍</div>
           <div style={{fontSize:15,fontWeight:600,marginBottom:8}}>
-            {matched.length>0?'目前有庫存商品為空':'目前商店找不到此成員相關商品'}
+            shop.nijisanji.jp 目前沒有此成員的商品
           </div>
-          <div style={{fontSize:12,marginBottom:16}}>
-            可<a href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer" style={{color:'var(--accent3)',margin:'0 4px'}}>直接在商店搜尋</a>
+          <div style={{fontSize:12}}>
+            可<a href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer" style={{color:'var(--accent3)',margin:'0 4px'}}>到商店直接搜尋</a>看看
           </div>
-          {matched.length>0&&(
-            <button onClick={()=>setShowAll(true)} style={{background:'var(--card-bg)',border:'1px solid var(--card-border)',color:'var(--text)',padding:'8px 18px',borderRadius:20,cursor:'pointer',fontSize:12}}>
-              顯示全部 {matched.length} 件（含缺貨）
-            </button>
-          )}
         </div>
       )}
 
-      {prods!==null&&display.length>0&&(
-        <div className="merch-grid">{display.map(p=><MerchCard key={p.id} p={p}/>)}</div>
+      {data&&matched.length>0&&(
+        <div className="merch-grid">{matched.map(p=><MerchCard key={p.code} p={p}/>)}</div>
       )}
     </div>
   );
