@@ -171,8 +171,11 @@ function MerchPage({member}){
 
   const matched=useMemo(()=>{
     if(!data||!member.name) return[];
-    // 用 talents 陣列精準比對（不再靠字串猜）
-    return data.products.filter(p=>(p.talents||[]).includes(member.name));
+    // 用 talents 陣列精準比對 + 過濾已下架 + 依 lastmod 由新到舊
+    const ms=data.products.filter(p=>
+      (p.talents||[]).includes(member.name) && p.available!==false
+    );
+    return ms.sort((a,b)=>(b.lastmod||'').localeCompare(a.lastmod||''));
   },[data,member]);
 
   const c=member.color||hc(member.id||'x');

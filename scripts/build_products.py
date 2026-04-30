@@ -42,20 +42,24 @@ def fetch(url: str, timeout: int = 15):
 
 
 def list_sitemap_codes():
-    codes = []
+    """回傳 [(code, lastmod_iso), ...]，依 sitemap 順序、去重。"""
+    pairs = []
     for sm in SITEMAPS:
         text = fetch(sm)
         if not text:
             continue
-        for m in re.finditer(r"https://shop\.nijisanji\.jp/([^<\s]+)\.html", text):
-            codes.append(m.group(1))
-    # dedup preserving order
+        for m in re.finditer(
+            r"<url>\s*<loc>https://shop\.nijisanji\.jp/([^<\s]+)\.html</loc>"
+            r"(?:\s*<lastmod>([^<]+)</lastmod>)?",
+            text,
+        ):
+            pairs.append((m.group(1), m.group(2) or ""))
     seen = set()
     uniq = []
-    for c in codes:
+    for c, lm in pairs:
         if c not in seen:
             seen.add(c)
-            uniq.append(c)
+            uniq.append((c, lm))
     return uniq
 
 
@@ -119,6 +123,20 @@ def extract_unit_tags(html: str):
     return sorted(tags)
 
 
+def parse_available(html: str):
+    """所有 variation radio 都 nostock=true → 視為下架；找不到資訊預設 True。"""
+    nostock_vals = re.findall(
+        r'js-product-radio[^>]*data-nostock=["\'](true|false)["\']', html
+    )
+    if nostock_vals:
+        return any(v == "false" for v in nostock_vals)
+    # 沒 variation radio：看 js-is-available
+    m = re.search(r'js-is-available["\'][^>]*value=["\'](true|false)["\']', html)
+    if m:
+        return m.group(1) == "true"
+    return True
+
+
 def parse_price(html: str):
     # <span class="price-sales">¥3,300</span> 之類
     m = re.search(r'class="[^"]*price[^"]*"[^>]*>[^¥]*¥\s*([\d,]+)', html)
@@ -130,7 +148,8 @@ def parse_price(html: str):
     return None
 
 
-def scrape_one(code: str):
+def scrape_one(code_lm):
+    code, lastmod = code_lm
     url = f"{BASE}/{code}.html"
     html = fetch(url, timeout=12)
     if not html:
@@ -150,6 +169,8 @@ def scrape_one(code: str):
         "title": title,
         "image": extract_meta(html, "og:image"),
         "price": parse_price(html),
+        "available": parse_available(html),
+        "lastmod": lastmod,
         "talents": extract_talents_from_liver(html),
         "units": extract_unit_tags(html),
     }
@@ -162,8 +183,9 @@ def main():
     print("=" * 55)
 
     print("\n[1/3] 抓 sitemap…")
-    codes = list_sitemap_codes()
-    print(f"  共 {len(codes)} 個商品 URL")
+    pairs = list_sitemap_codes()
+    print(f"  共 {len(pairs)} 個商品 URL")
+    lastmod_map = {c: lm for c, lm in pairs}
 
     existing = {}
     if PRODUCTS_FILE.exists():
@@ -175,15 +197,20 @@ def main():
         except Exception:
             existing = {}
 
-    valid_codes = set(codes)
-    todo = [c for c in codes if c not in existing]
+    valid_codes = set(lastmod_map.keys())
+    # 需重抓：新出現的 + 既有但缺 available 欄位的（首次補抓）
+    todo = []
+    for c, lm in pairs:
+        e = existing.get(c)
+        if e is None or "available" not in e:
+            todo.append((c, lm))
     print(f"  需新抓：{len(todo)} 筆")
 
     print(f"\n[2/3] 並發抓商品頁（{WORKERS} workers）…")
     new_products = []
     fails = 0
     with ThreadPoolExecutor(max_workers=WORKERS) as ex:
-        futures = {ex.submit(scrape_one, c): c for c in todo}
+        futures = {ex.submit(scrape_one, cl): cl for cl in todo}
         done = 0
         total = len(todo)
         for fut in as_completed(futures):
@@ -198,11 +225,13 @@ def main():
 
     new_codes_set = {p["code"] for p in new_products}
     merged = list(new_products)
-    # 保留既有資料中：仍在 sitemap + 這次沒重抓的
+    # 保留既有資料中：仍在 sitemap + 這次沒重抓的，順便把 lastmod 更新
     for code, p in existing.items():
         if code in valid_codes and code not in new_codes_set:
+            p["lastmod"] = lastmod_map.get(code, p.get("lastmod", ""))
             merged.append(p)
-    merged.sort(key=lambda x: x["code"])
+    # 排序：lastmod 由新到舊；缺 lastmod 的擺最後
+    merged.sort(key=lambda x: x.get("lastmod") or "", reverse=True)
 
     output = {
         "lastUpdated": datetime.now().strftime("%Y-%m-%d"),
@@ -214,10 +243,12 @@ def main():
 
     has_t = sum(1 for p in merged if p["talents"])
     has_u = sum(1 for p in merged if p["units"])
+    avail = sum(1 for p in merged if p.get("available", True))
     size_mb = PRODUCTS_FILE.stat().st_size / 1024 / 1024
     print(f"\n✓ 完成：{len(merged)} 筆商品（{size_mb:.2f} MB）")
     print(f"  有 ライバー 標記：{has_t}")
     print(f"  有 unit/group 標記：{has_u}")
+    print(f"  仍在販售：{avail} / 已下架：{len(merged) - avail}")
 
 
 if __name__ == "__main__":
