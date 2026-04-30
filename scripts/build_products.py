@@ -223,15 +223,27 @@ def main():
             else:
                 fails += 1
 
+    now_iso = datetime.now().isoformat(timespec="seconds")
     new_codes_set = {p["code"] for p in new_products}
-    merged = list(new_products)
-    # 保留既有資料中：仍在 sitemap + 這次沒重抓的，順便把 lastmod 更新
+    merged = []
+    # 新抓：第一次出現 → firstSeenAt = 既有保留 / 不然用今天；再次出現的舊 code → 沿用舊 firstSeenAt
+    for p in new_products:
+        e = existing.get(p["code"])
+        if e and e.get("firstSeenAt"):
+            p["firstSeenAt"] = e["firstSeenAt"]
+        else:
+            # 首次跑：用 lastmod 當作 firstSeenAt 的近似（preserve 相對順序）
+            p["firstSeenAt"] = (e or {}).get("lastmod") or p.get("lastmod") or now_iso
+        merged.append(p)
+    # 保留既有資料中：仍在 sitemap + 這次沒重抓的；補回 lastmod / firstSeenAt
     for code, p in existing.items():
         if code in valid_codes and code not in new_codes_set:
             p["lastmod"] = lastmod_map.get(code, p.get("lastmod", ""))
+            if not p.get("firstSeenAt"):
+                p["firstSeenAt"] = p.get("lastmod") or now_iso
             merged.append(p)
-    # 排序：lastmod 由新到舊；缺 lastmod 的擺最後
-    merged.sort(key=lambda x: x.get("lastmod") or "", reverse=True)
+    # 排序：firstSeenAt 由新到舊（再販不會跑到前面），缺值擺最後
+    merged.sort(key=lambda x: x.get("firstSeenAt") or "", reverse=True)
 
     output = {
         "lastUpdated": datetime.now().strftime("%Y-%m-%d"),

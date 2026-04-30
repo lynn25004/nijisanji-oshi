@@ -175,7 +175,7 @@ function MerchPage({member}){
     const ms=data.products.filter(p=>
       (p.talents||[]).includes(member.name) && p.available!==false
     );
-    return ms.sort((a,b)=>(b.lastmod||'').localeCompare(a.lastmod||''));
+    return ms.sort((a,b)=>(b.firstSeenAt||b.lastmod||'').localeCompare(a.firstSeenAt||a.lastmod||''));
   },[data,member]);
 
   const c=member.color||hc(member.id||'x');
@@ -332,12 +332,13 @@ function App(){
   const[members,setMembers]=useState([]);
   const[lastUpdated,setLastUpdated]=useState('');
   const[loading,setLoading]=useState(true);
-  const[view,setView]=useState('select');
   const[curMember,setCurMember]=useState(null);
   const[oshiIds,setOshiIds]=useState(()=>{
     try{return new Set(JSON.parse(localStorage.getItem('niji_oshi')||'[]'));}
     catch{return new Set();}
   });
+  // 已選過推し → 直接落地我的推し；沒選過 → 從成員清單開始
+  const[view,setView]=useState(()=>oshiIds.size>0?'oshi':'select');
   useEffect(()=>{try{localStorage.setItem('niji_oshi',JSON.stringify([...oshiIds]));}catch{}},[oshiIds]);
   useEffect(()=>{
     fetch('./data/members.json').then(r=>r.json()).then(d=>{
