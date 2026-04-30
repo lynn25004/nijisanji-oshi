@@ -244,12 +244,36 @@ function MerchPage({member}){
   );
 }
 
-function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack}){
+function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyShared}){
   const list=members.filter(m=>oshiIds.has(m.id));
+  const[copyMsg,setCopyMsg]=useState('');
+  const share=async()=>{
+    const ids=[...oshiIds].join(',');
+    const url=`${location.origin}${location.pathname}?oshi=${encodeURIComponent(ids)}`;
+    try{await navigator.clipboard.writeText(url);setCopyMsg('已複製連結！');}
+    catch{setCopyMsg(url);}
+    setTimeout(()=>setCopyMsg(''),3000);
+  };
   return(
     <div className="oshi-page">
-      <div className="page-title">💜 我的推し</div>
+      <div className="page-title">💜 {isShared?'朋友的推し':'我的推し'}</div>
       <div className="page-sub">共 {list.length} 位 · 點擊成員查看周邊商品</div>
+      {isShared&&(
+        <div style={{textAlign:'center',margin:'8px 0 14px'}}>
+          <button onClick={onApplyShared} style={{background:'var(--accent)',border:'none',color:'#fff',padding:'8px 18px',borderRadius:20,cursor:'pointer',fontSize:13,marginRight:8}}>
+            套用為自己的清單
+          </button>
+          <span style={{fontSize:11,color:'var(--text2)'}}>（不套用：只是瀏覽，不會存到你瀏覽器）</span>
+        </div>
+      )}
+      {!isShared&&list.length>0&&(
+        <div style={{textAlign:'center',margin:'8px 0 14px'}}>
+          <button onClick={share} style={{background:'var(--card-bg)',border:'1px solid var(--card-border)',color:'var(--text)',padding:'8px 18px',borderRadius:20,cursor:'pointer',fontSize:13}}>
+            🔗 分享我的清單
+          </button>
+          {copyMsg&&<div style={{marginTop:6,fontSize:11,color:'var(--text2)'}}>{copyMsg}</div>}
+        </div>
+      )}
       <div className="oshi-grid">
         {list.map(m=>{
           const c=m.color||hc(m.id||'x');
@@ -333,13 +357,29 @@ function App(){
   const[lastUpdated,setLastUpdated]=useState('');
   const[loading,setLoading]=useState(true);
   const[curMember,setCurMember]=useState(null);
+  // 解析分享連結 ?oshi=id1,id2,id3
+  const sharedIds=(()=>{
+    try{
+      const v=new URLSearchParams(location.search).get('oshi');
+      return v?v.split(',').map(s=>s.trim()).filter(Boolean):null;
+    }catch{return null;}
+  })();
+  const[isShared,setIsShared]=useState(()=>!!sharedIds);
   const[oshiIds,setOshiIds]=useState(()=>{
+    if(sharedIds) return new Set(sharedIds);
     try{return new Set(JSON.parse(localStorage.getItem('niji_oshi')||'[]'));}
     catch{return new Set();}
   });
-  // 已選過推し → 直接落地我的推し；沒選過 → 從成員清單開始
+  // 已選過推し（自己 or 從分享連結）→ 直接落地我的推し；沒有 → 從成員清單開始
   const[view,setView]=useState(()=>oshiIds.size>0?'oshi':'select');
-  useEffect(()=>{try{localStorage.setItem('niji_oshi',JSON.stringify([...oshiIds]));}catch{}},[oshiIds]);
+  const applySharedToSelf=useCallback(()=>{
+    setIsShared(false);
+    history.replaceState(null,'',location.pathname);
+  },[]);
+  useEffect(()=>{
+    if(isShared) return;  // 分享模式下不污染自己的 localStorage
+    try{localStorage.setItem('niji_oshi',JSON.stringify([...oshiIds]));}catch{}
+  },[oshiIds,isShared]);
   useEffect(()=>{
     fetch('./data/members.json').then(r=>r.json()).then(d=>{
       const s=[...(d.members||[])].sort((a,b)=>(!a.debutDate?1:!b.debutDate?-1:a.debutDate.localeCompare(b.debutDate)));
@@ -361,7 +401,7 @@ function App(){
         </div>
       </div>
       {view==='select'&&<MemberSelect members={members} lastUpdated={lastUpdated} oshiIds={oshiIds} onToggle={toggleOshi} onViewOshi={()=>setView('oshi')}/>}
-      {view==='oshi'&&<OshiPage members={members} oshiIds={oshiIds} onRemove={removeOshi} onViewMerch={m=>{setCurMember(m);setView('merch');}} onBack={()=>setView('select')}/>}
+      {view==='oshi'&&<OshiPage members={members} oshiIds={oshiIds} onRemove={removeOshi} onViewMerch={m=>{setCurMember(m);setView('merch');}} onBack={()=>setView('select')} isShared={isShared} onApplyShared={applySharedToSelf}/>}
       {view==='merch'&&curMember&&<MerchPage member={curMember}/>}
     </div>
   );
