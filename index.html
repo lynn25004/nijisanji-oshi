@@ -175,7 +175,14 @@ function MerchPage({member}){
     const ms=data.products.filter(p=>
       (p.talents||[]).includes(member.name) && p.available!==false
     );
-    return ms.sort((a,b)=>(b.firstSeenAt||b.lastmod||'').localeCompare(a.firstSeenAt||a.lastmod||''));
+    // 排序：優先用官方「掲載開始日(新しい順)」rank，沒有則退回 firstSeenAt 新→舊
+    const BIG=1e9;
+    return ms.sort((a,b)=>{
+      const ra=Number.isFinite(a.officialOrder)?a.officialOrder:BIG;
+      const rb=Number.isFinite(b.officialOrder)?b.officialOrder:BIG;
+      if(ra!==rb) return ra-rb;
+      return (b.firstSeenAt||b.lastmod||'').localeCompare(a.firstSeenAt||a.lastmod||'');
+    });
   },[data,member]);
 
   const c=member.color||hc(member.id||'x');

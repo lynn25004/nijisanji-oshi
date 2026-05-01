@@ -5,7 +5,7 @@
 
 支援增量：第二次跑只抓新出現在 sitemap 的商品代碼。
 """
-import json, re, sys
+import json, re, sys, time
 from pathlib import Path
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -176,6 +176,52 @@ def scrape_one(code_lm):
     }
 
 
+def fetch_official_order():
+    """
+    從 shop.nijisanji.jp 官方搜尋的「掲載開始日(新しい順)」拉全站排序。
+    回傳 {code: rank}，rank 從 0 起，越小越新。
+
+    SFCC `searchUpdateGrid` 的 `sz` 參數實測不會被嚴格遵守：
+    sz=200 但 start=0 與 start=200 會回傳相同內容，下一頁要 start=400 才會換。
+    所以用「累積已見筆數」當作下一輪 start，避免重複頁。
+    """
+    # SFCC 的 pagination granularity 實測為 400（sz 不嚴格遵守，連續 start=0 與 start=200 回同一頁）
+    rank_map = {}
+    page_size = 400
+    step = 400
+    max_pages = 100
+    start = 0
+    no_progress = 0
+    for i in range(max_pages):
+        url = (
+            f"{BASE}/searchUpdateGrid?cgid=all"
+            f"&srule=order-accepted-new&start={start}&sz={page_size}"
+        )
+        text = fetch(url, timeout=25)
+        if not text:
+            time.sleep(2.0)
+            text = fetch(url, timeout=30)
+        if not text:
+            break
+        pids = re.findall(r'data-pid="([^"]+)"', text)
+        if not pids:
+            break
+        added = 0
+        for p in pids:
+            if p not in rank_map:
+                rank_map[p] = len(rank_map)
+                added += 1
+        if added == 0:
+            no_progress += 1
+            if no_progress >= 2:
+                break
+        else:
+            no_progress = 0
+        start += step
+        time.sleep(0.8)  # 禮貌節流，避免 SFCC rate limit
+    return rank_map
+
+
 def main():
     print("=" * 55)
     print("shop.nijisanji.jp 商品索引建立")
@@ -242,8 +288,21 @@ def main():
             if not p.get("firstSeenAt"):
                 p["firstSeenAt"] = p.get("lastmod") or now_iso
             merged.append(p)
-    # 排序：firstSeenAt 由新到舊（再販不會跑到前面），缺值擺最後
-    merged.sort(key=lambda x: x.get("firstSeenAt") or "", reverse=True)
+    # 抓官方「掲載開始日(新しい順)」全站排序
+    print(f"\n[2.5/3] 抓官方掲載開始日順序…")
+    rank_map = fetch_official_order()
+    print(f"  取得 {len(rank_map)} 筆官方排序")
+    for p in merged:
+        rank = rank_map.get(p["code"])
+        if rank is not None:
+            p["officialOrder"] = rank
+
+    # 排序：先放有官方排序的（升冪 = 新→舊），其餘依 firstSeenAt 新→舊放後面
+    indexed = [p for p in merged if "officialOrder" in p]
+    indexed.sort(key=lambda x: x["officialOrder"])
+    rest = [p for p in merged if "officialOrder" not in p]
+    rest.sort(key=lambda x: x.get("firstSeenAt") or "", reverse=True)
+    merged = indexed + rest
 
     output = {
         "lastUpdated": datetime.now().strftime("%Y-%m-%d"),
