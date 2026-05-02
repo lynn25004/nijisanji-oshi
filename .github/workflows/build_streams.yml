@@ -33,9 +33,13 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Actions"
           git fetch origin data
-          git checkout data
-          cp /tmp/streams.json streams.json
+          git worktree add /tmp/dwt origin/data
+          git config --local user.name "GitHub Actions"
+          git fetch origin data
+          git worktree add /tmp/dwt origin/data
+          cp /tmp/streams.json /tmp/dwt/streams.json
+          cd /tmp/dwt
           git add streams.json
           git diff --staged --quiet && echo "no change, skip" && exit 0
           git commit -m "更新直播資料 $(date -u +%Y-%m-%dT%H:%MZ)"
-          git push origin data
+          git push origin HEAD:data
