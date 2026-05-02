@@ -145,7 +145,11 @@
     .toggle-sw.on::after{left:16px}
     .store-links{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 16px}
     .store-link-btn{display:inline-flex;align-items:center;gap:6px;background:var(--card-bg);border:1px solid var(--card-border);color:var(--text);padding:8px 16px;border-radius:20px;font-size:12px;text-decoration:none;transition:all .2s}
-    .store-link-btn:hover{border-color:var(--accent2)}
+    .store-link-btn:hover{border-color:var(--accent2);transform:translateY(-1px)}
+    .store-link-btn.yt:hover{border-color:#ff0000;color:#ff4444}
+    .store-link-btn.x:hover{border-color:#1da1f2;color:#1da1f2}
+    .store-link-btn.tw:hover{border-color:#9146ff;color:#9146ff}
+    .store-link-btn.shop:hover{border-color:var(--accent1);color:var(--accent1)}
     .fetch-status{font-size:10px;color:var(--text2);padding:0 18px 8px}
     .auth-btn{background:linear-gradient(135deg,var(--accent1),var(--accent2));border:none;color:#fff;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;transition:transform .15s}
     .auth-btn:hover{transform:translateY(-1px)}
@@ -318,6 +322,18 @@ async function loadProducts(){
   return _productsCache;
 }
 
+// 社群連結（YouTube / X / Twitch），由 build_social.py 週週更新
+let _socialCache=null;
+async function loadSocial(){
+  if(_socialCache) return _socialCache;
+  try{
+    const r=await fetch('./data/social.json',{cache:'no-cache'});
+    if(!r.ok) return null;
+    _socialCache=await r.json();
+    return _socialCache;
+  }catch{return null;}
+}
+
 // 直播資料（live + upcoming + past），存在 GitHub data branch，每 15 分鐘更新
 // 不放在 main 避免污染 git log
 const STREAMS_URL='https://raw.githubusercontent.com/lynn25004/nijisanji-oshi/data/streams.json';
@@ -488,11 +504,13 @@ function StreamsForMember({member}){
 function MerchPage({member}){
   const[data,setData]=useState(null);
   const[err,setErr]=useState('');
+  const[social,setSocial]=useState(null);
 
   useEffect(()=>{
     setErr('');
     loadProducts().then(setData).catch(e=>setErr(e.message));
-  },[]);
+    loadSocial().then(s=>setSocial(s?.social?.[member.id]||null));
+  },[member.id]);
 
   const matched=useMemo(()=>{
     if(!data||!member.name) return[];
@@ -531,8 +549,13 @@ function MerchPage({member}){
       </div>
 
       <div className="store-links">
-        <a className="store-link-btn" href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer">🛒 shop.nijisanji.jp 搜尋</a>
-        {member.channelUrl&&<a className="store-link-btn" href={member.channelUrl} target="_blank" rel="noreferrer">▶ YouTube</a>}
+        <a className="store-link-btn shop" href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer">🛒 商店搜尋</a>
+        {(social?.youtube||member.channelUrl)&&
+          <a className="store-link-btn yt" href={social?.youtube||member.channelUrl} target="_blank" rel="noreferrer">▶️ YouTube</a>}
+        {social?.twitter&&
+          <a className="store-link-btn x" href={social.twitter} target="_blank" rel="noreferrer">𝕏 Twitter</a>}
+        {social?.twitch&&
+          <a className="store-link-btn tw" href={social.twitch} target="_blank" rel="noreferrer">🟣 Twitch</a>}
       </div>
 
       <div style={{padding:'0 18px'}}>
