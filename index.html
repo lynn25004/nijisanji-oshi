@@ -140,9 +140,48 @@ const {useState,useEffect,useCallback,useMemo,useRef}=React;
 
 const SUPABASE_URL='https://fntotxazjfkzwejotxac.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_2mMxRnHZLrIJCOfWlniPfA_XHDh0LGi';
+const VAPID_PUBLIC='BI11MhCMb8W1HkUMRdzvmPked1D20q35I5RR1b-KllDl-jvw3XtpJfLbWUDy5YGsVG-mdZkL3TgQqKfyTvH0ycg';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true}
 });
+
+// Service Worker 註冊（一次就好）
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('SW register fail',e));
+}
+
+// VAPID base64url → Uint8Array
+function urlBase64ToUint8Array(b64){
+  const pad='='.repeat((4-b64.length%4)%4);
+  const base64=(b64+pad).replace(/-/g,'+').replace(/_/g,'/');
+  const raw=atob(base64);
+  const out=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;++i) out[i]=raw.charCodeAt(i);
+  return out;
+}
+
+async function ensurePushSubscription(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window))
+    throw new Error('此瀏覽器不支援 Web Push（iPhone 請到主畫面安裝後再試）');
+  const reg=await navigator.serviceWorker.ready;
+  let sub=await reg.pushManager.getSubscription();
+  if(!sub){
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted') throw new Error('您拒絕了通知權限');
+    sub=await reg.pushManager.subscribe({
+      userVisibleOnly:true,
+      applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC),
+    });
+  }
+  return sub;
+}
+
+async function unsubscribePush(){
+  if(!('serviceWorker' in navigator)) return;
+  const reg=await navigator.serviceWorker.ready;
+  const sub=await reg.pushManager.getSubscription();
+  if(sub) await sub.unsubscribe();
+}
 
 const STORE='https://shop.nijisanji.jp';
 // 商品資料由 GitHub Actions 預先抓 shop.nijisanji.jp 全部商品 → data/products.json
@@ -281,7 +320,7 @@ function MerchPage({member}){
   );
 }
 
-function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyShared,notifyOn,onToggleNotify,loggedIn,onLoginClick}){
+function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyShared,notify,onToggleEmail,onTogglePush,notifyMsg,loggedIn,onLoginClick}){
   const list=members.filter(m=>oshiIds.has(m.id));
   const[copyMsg,setCopyMsg]=useState('');
   const share=async()=>{
@@ -313,11 +352,27 @@ function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyS
       )}
       {!isShared&&list.length>0&&(
         loggedIn
-          ? <NotifyToggle enabled={notifyOn} onChange={onToggleNotify}/>
+          ? <>
+              <NotifyGroup
+                title="🛍️ 新品上架通知"
+                sub="shop.nijisanji.jp 有你推的成員新商品時通知"
+                emailOn={notify.productEmail} pushOn={notify.productPush}
+                onToggleEmail={v=>onToggleEmail('product',v)}
+                onTogglePush={v=>onTogglePush('product',v)}
+              />
+              <NotifyGroup
+                title="🔴 直播開播提醒"
+                sub="推し排程開播（90 分鐘內）或正在直播時通知"
+                emailOn={notify.streamEmail} pushOn={notify.streamPush}
+                onToggleEmail={v=>onToggleEmail('stream',v)}
+                onTogglePush={v=>onTogglePush('stream',v)}
+              />
+              {notifyMsg&&<div style={{fontSize:11,color:'#ff9999',padding:'4px 0'}}>{notifyMsg}</div>}
+            </>
           : <div className="notify-row" onClick={onLoginClick} style={{cursor:'pointer'}}>
               <div>
-                <div className="nt-label">🔔 想要新品通知？</div>
-                <div className="nt-sub">登入後可訂閱 email，每小時檢查一次</div>
+                <div className="nt-label">🔔 想收新品 + 直播通知？</div>
+                <div className="nt-sub">登入後可訂閱 email + 瀏覽器推播</div>
               </div>
               <button className="auth-btn">登入</button>
             </div>
@@ -446,16 +501,23 @@ function AuthBar({session,onLogin,onLogout}){
   );
 }
 
-function NotifyToggle({enabled,onChange,disabled}){
+function NotifyGroup({title,sub,emailOn,pushOn,onToggleEmail,onTogglePush}){
   return(
-    <div className="notify-row">
+    <div className="notify-row" style={{flexDirection:'column',alignItems:'stretch',gap:8}}>
       <div>
-        <div className="nt-label">🔔 新品上架時 email 通知我</div>
-        <div className="nt-sub">{disabled?'登入後即可開啟':'每小時檢查一次，shop.nijisanji.jp 有你推的成員新商品時會寄信給你'}</div>
+        <div className="nt-label">{title}</div>
+        <div className="nt-sub">{sub}</div>
       </div>
-      <label className="toggle-label" onClick={()=>!disabled&&onChange(!enabled)} style={{opacity:disabled?.4:1,cursor:disabled?'not-allowed':'pointer'}}>
-        <span className={`toggle-sw ${enabled?'on':''}`}></span>
-      </label>
+      <div style={{display:'flex',gap:14}}>
+        <label className="toggle-label" onClick={()=>onToggleEmail(!emailOn)} style={{cursor:'pointer'}}>
+          <span className={`toggle-sw ${emailOn?'on':''}`}></span>
+          <span style={{fontSize:12}}>📧 Email</span>
+        </label>
+        <label className="toggle-label" onClick={()=>onTogglePush(!pushOn)} style={{cursor:'pointer'}}>
+          <span className={`toggle-sw ${pushOn?'on':''}`}></span>
+          <span style={{fontSize:12}}>🔔 推播</span>
+        </label>
+      </div>
     </div>
   );
 }
@@ -467,7 +529,11 @@ function App(){
   const[curMember,setCurMember]=useState(null);
   const[session,setSession]=useState(null);
   const[showLogin,setShowLogin]=useState(false);
-  const[notifyOn,setNotifyOn]=useState(false);
+  const[notify,setNotify]=useState({
+    productEmail:false, productPush:false,
+    streamEmail:false, streamPush:false,
+  });
+  const[notifyMsg,setNotifyMsg]=useState('');
   const syncedRef=useRef(false);
   // 解析分享連結 ?oshi=id1,id2,id3
   const sharedIds=(()=>{
@@ -504,7 +570,10 @@ function App(){
     sb.auth.getSession().then(({data})=>setSession(data.session));
     const{data:sub}=sb.auth.onAuthStateChange((_e,s)=>{
       setSession(s);
-      if(!s){syncedRef.current=false;setNotifyOn(false);}
+      if(!s){
+        syncedRef.current=false;
+        setNotify({productEmail:false,productPush:false,streamEmail:false,streamPush:false});
+      }
     });
     return()=>sub.subscription.unsubscribe();
   },[]);
@@ -516,7 +585,7 @@ function App(){
     (async()=>{
       const[{data:subs},{data:settings}]=await Promise.all([
         sb.from('oshi_subscriptions').select('member_id').eq('user_id',session.user.id),
-        sb.from('oshi_notify_settings').select('email_enabled').eq('user_id',session.user.id).maybeSingle()
+        sb.from('oshi_notify_settings').select('email_enabled,product_push_enabled,stream_email_enabled,stream_push_enabled').eq('user_id',session.user.id).maybeSingle()
       ]);
       const remote=new Set((subs||[]).map(r=>r.member_id));
       const local=new Set(oshiIds);
@@ -528,7 +597,12 @@ function App(){
       if(toInsert.length){
         await sb.from('oshi_subscriptions').insert(toInsert.map(member_id=>({user_id:session.user.id,member_id})));
       }
-      setNotifyOn(!!settings?.email_enabled);
+      setNotify({
+        productEmail:!!settings?.email_enabled,
+        productPush:!!settings?.product_push_enabled,
+        streamEmail:!!settings?.stream_email_enabled,
+        streamPush:!!settings?.stream_push_enabled,
+      });
     })();
   },[session,isShared]);
 
@@ -552,20 +626,61 @@ function App(){
     }
   },[session,isShared]);
 
-  const toggleNotify=useCallback(async(v)=>{
-    setNotifyOn(v);
+  // 寫入單一設定欄位
+  const writeSetting=useCallback(async(field,v)=>{
     if(!session) return;
     await sb.from('oshi_notify_settings').upsert({
       user_id:session.user.id,
-      email_enabled:v,
+      [field]:v,
       updated_at:new Date().toISOString()
     });
   },[session]);
 
+  // Email 切換：直接寫
+  const toggleEmail=useCallback(async(kind,v)=>{
+    setNotify(n=>({...n,[kind+'Email']:v}));
+    await writeSetting(kind==='product'?'email_enabled':'stream_email_enabled', v);
+  },[writeSetting]);
+
+  // Push 切換：v=true 時要求權限 + 訂閱 + 存 endpoint；v=false 時取消訂閱
+  const togglePush=useCallback(async(kind,v)=>{
+    if(!session) return;
+    setNotifyMsg('');
+    try{
+      if(v){
+        const sub=await ensurePushSubscription();
+        const j=sub.toJSON();
+        await sb.from('oshi_push_subscriptions').upsert({
+          user_id:session.user.id,
+          endpoint:j.endpoint,
+          p256dh:j.keys.p256dh,
+          auth:j.keys.auth,
+          user_agent:navigator.userAgent.slice(0,500),
+        },{onConflict:'endpoint'});
+      }
+      // 注意：不在 v=false 時 unsubscribe，因為兩個 push 開關共用 1 個 subscription
+      // 只關掉 server-side flag 即可
+      setNotify(n=>({...n,[kind+'Push']:v}));
+      await writeSetting(kind==='product'?'product_push_enabled':'stream_push_enabled', v);
+      // 如果兩個 push 都關了，順便移除 subscription
+      const otherKey=kind==='product'?'streamPush':'productPush';
+      if(!v && !notify[otherKey]){
+        await unsubscribePush();
+        const reg=await navigator.serviceWorker.ready;
+        const s=await reg.pushManager.getSubscription();
+        if(!s){
+          await sb.from('oshi_push_subscriptions').delete().eq('user_id',session.user.id);
+        }
+      }
+    }catch(e){
+      setNotifyMsg('開啟推播失敗：'+(e.message||e));
+      setNotify(n=>({...n,[kind+'Push']:false}));
+    }
+  },[session,writeSetting,notify]);
+
   const logout=useCallback(async()=>{
     await sb.auth.signOut();
-    // 登出後保留本機 oshiIds，但清除通知設定
-    setNotifyOn(false);
+    setNotify({productEmail:false,productPush:false,streamEmail:false,streamPush:false});
   },[]);
   const titles={select:'彩虹社推し選擇器',oshi:'我的推し',merch:curMember?.name||'商品'};
   if(loading)return <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'80vh'}}><div className="spinner"></div></div>;
@@ -581,7 +696,7 @@ function App(){
         </div>
       </div>
       {view==='select'&&<MemberSelect members={members} lastUpdated={lastUpdated} oshiIds={oshiIds} onToggle={toggleOshi} onViewOshi={()=>setView('oshi')}/>}
-      {view==='oshi'&&<OshiPage members={members} oshiIds={oshiIds} onRemove={removeOshi} onViewMerch={m=>{setCurMember(m);setView('merch');}} onBack={()=>setView('select')} isShared={isShared} onApplyShared={applySharedToSelf} notifyOn={notifyOn} onToggleNotify={toggleNotify} loggedIn={!!session} onLoginClick={()=>setShowLogin(true)}/>}
+      {view==='oshi'&&<OshiPage members={members} oshiIds={oshiIds} onRemove={removeOshi} onViewMerch={m=>{setCurMember(m);setView('merch');}} onBack={()=>setView('select')} isShared={isShared} onApplyShared={applySharedToSelf} notify={notify} onToggleEmail={toggleEmail} onTogglePush={togglePush} notifyMsg={notifyMsg} loggedIn={!!session} onLoginClick={()=>setShowLogin(true)}/>}
       {view==='merch'&&curMember&&<MerchPage member={curMember}/>}
       {showLogin&&<LoginModal onClose={()=>setShowLogin(false)}/>}
     </div>
