@@ -318,12 +318,16 @@ async function loadProducts(){
   return _productsCache;
 }
 
-// 直播資料（live + upcoming + past），由 build_streams.py 每小時更新
+// 直播資料（live + upcoming + past），存在 GitHub data branch，每 15 分鐘更新
+// 不放在 main 避免污染 git log
+const STREAMS_URL='https://raw.githubusercontent.com/lynn25004/nijisanji-oshi/data/streams.json';
 let _streamsCache=null;
 async function loadStreams(){
   if(_streamsCache) return _streamsCache;
   try{
-    const r=await fetch('./data/streams.json',{cache:'no-cache'});
+    // 加 timestamp 規避 raw.githubusercontent CDN 5 分鐘快取
+    const t=Math.floor(Date.now()/300000);
+    const r=await fetch(`${STREAMS_URL}?t=${t}`,{cache:'no-cache'});
     if(!r.ok) return null;
     _streamsCache=await r.json();
     return _streamsCache;

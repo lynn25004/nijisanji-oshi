@@ -1,4 +1,4 @@
-name: 每小時更新直播資料 (data/streams.json)
+name: 每 15 分鐘更新直播資料 (data branch)
 
 on:
   schedule:
@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 需要拿到所有 branch
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -24,13 +26,17 @@ jobs:
         env:
           HOLODEX_API_KEY: ${{ secrets.HOLODEX_API_KEY }}
         run: python -u scripts/build_streams.py
-      - name: 提交 streams.json
+      - name: 推 streams.json 到 data branch
         run: |
+          set -e
+          cp data/streams.json /tmp/streams.json
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Actions"
-          git add data/streams.json
-          git diff --staged --quiet || git commit -m "更新直播資料 $(date -u +%Y-%m-%dT%H:%M)"
-      - uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          # 切到 data branch（已存在）
+          git fetch origin data
+          git checkout data
+          cp /tmp/streams.json streams.json
+          git add streams.json
+          git diff --staged --quiet && echo "no change, skip" && exit 0
+          git commit -m "更新直播資料 $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push origin data
