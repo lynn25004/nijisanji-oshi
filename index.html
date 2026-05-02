@@ -229,6 +229,28 @@
     /* PWA install hint */
     .install-hint{background:var(--card-bg);border:1px dashed var(--card-border);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.6}
     .install-hint b{color:var(--text)}
+
+    /* Stream section */
+    .stream-sec{margin:0 0 18px}
+    .stream-hdr{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-bottom:10px;color:var(--text)}
+    .stream-hdr .pill{font-size:10px;background:var(--card-bg);color:var(--text2);padding:2px 8px;border-radius:10px;font-weight:500;border:1px solid var(--card-border)}
+    .stream-hdr.live{color:#ff4444}
+    .stream-hdr.live .live-dot{width:8px;height:8px;background:#ff4444;border-radius:50%;animation:blink 1.2s infinite}
+    @keyframes blink{50%{opacity:.3}}
+    .stream-card{display:flex;gap:10px;padding:10px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;margin-bottom:8px;text-decoration:none;color:var(--text);transition:all .2s;align-items:flex-start}
+    .stream-card:hover{border-color:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 14px var(--shadow)}
+    .stream-card.live-card{border-color:#ff4444;background:linear-gradient(135deg,var(--card-bg),rgba(255,68,68,.06))}
+    .stream-thumb{width:120px;aspect-ratio:16/9;border-radius:6px;object-fit:cover;background:var(--bg3);flex-shrink:0;position:relative}
+    .stream-info{flex:1;min-width:0}
+    .stream-title{font-size:13px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:4px}
+    .stream-meta{font-size:11px;color:var(--text2);line-height:1.5}
+    .stream-meta .badge{display:inline-block;background:var(--bg3);padding:1px 7px;border-radius:8px;margin-right:5px;font-size:10px}
+    .stream-meta .badge.live{background:#ff4444;color:#fff}
+    .stream-meta .badge.soon{background:var(--grad-pink);color:#fff}
+    @media(max-width:480px){
+      .stream-thumb{width:100px}
+      .stream-title{font-size:12px}
+    }
   </style>
 </head>
 <body>
@@ -296,6 +318,61 @@ async function loadProducts(){
   return _productsCache;
 }
 
+// 直播資料（live + upcoming + past），由 build_streams.py 每小時更新
+let _streamsCache=null;
+async function loadStreams(){
+  if(_streamsCache) return _streamsCache;
+  try{
+    const r=await fetch('./data/streams.json',{cache:'no-cache'});
+    if(!r.ok) return null;
+    _streamsCache=await r.json();
+    return _streamsCache;
+  }catch{return null;}
+}
+
+// 比對成員 ↔ Holodex channel（跟後端 notify_streams.py 同邏輯）
+function matchChannel(channel, member){
+  if(!channel||!member) return false;
+  const cname=(channel.name||'').toLowerCase();
+  const cen=(channel.english_name||'').toLowerCase();
+  const n=(member.name||'').toLowerCase();
+  const ne=(member.nameEn||'').toLowerCase();
+  if(n&&(cname.includes(n)||cen.includes(n))) return true;
+  if(ne){
+    const tokens=ne.split(/\s+/).filter(t=>t.length>=3);
+    if(tokens.length>=2&&tokens.every(t=>cen.includes(t)||cname.includes(t))) return true;
+  }
+  return false;
+}
+
+// 時間格式化
+function fmtRelative(iso){
+  if(!iso) return '';
+  const t=new Date(iso).getTime();
+  const now=Date.now();
+  const diff=Math.round((t-now)/60000);  // 分鐘
+  if(Math.abs(diff)<1) return '剛剛';
+  if(diff>0){
+    if(diff<60) return `${diff} 分鐘後`;
+    if(diff<1440) return `${Math.round(diff/60)} 小時後`;
+    return `${Math.round(diff/1440)} 天後`;
+  }
+  const ago=-diff;
+  if(ago<60) return `${ago} 分鐘前`;
+  if(ago<1440) return `${Math.round(ago/60)} 小時前`;
+  return `${Math.round(ago/1440)} 天前`;
+}
+function fmtClock(iso){
+  if(!iso) return '';
+  const d=new Date(iso);
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function fmtDuration(sec){
+  if(!sec) return '';
+  const h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60);
+  return h>0?`${h}h${m}m`:`${m}m`;
+}
+
 function bl(b){return{JP:'🇯🇵 JP',EN:'🌍 EN',VR:'🌐 VR'}[b]||b}
 function fd(d){if(!d)return'';const[y,m,day]=d.split('-');return`${y}年${+m}月${+day}日`}
 function ini(n){if(!n)return'?';return/^[A-Za-z]/.test(n)?n.slice(0,2).toUpperCase():n.slice(0,1)}
@@ -325,6 +402,82 @@ function MerchCard({p}){
         )}
       </div>
     </a>
+  );
+}
+
+function StreamCard({s,kind}){
+  const url=`https://www.youtube.com/watch?v=${s.id}`;
+  const thumb=`https://i.ytimg.com/vi/${s.id}/mqdefault.jpg`;
+  let badge=null, when='';
+  if(kind==='live'){
+    badge=<span className="badge live">🔴 LIVE</span>;
+    when=`${fmtRelative(s.start_actual||s.available_at)}開始 · ${(s.live_viewers||0).toLocaleString()} 觀看`;
+  }else if(kind==='upcoming'){
+    const diff=(new Date(s.start_scheduled).getTime()-Date.now())/60000;
+    badge=diff<60?<span className="badge soon">即將</span>:<span className="badge">⏰ 排程</span>;
+    when=`${fmtClock(s.start_scheduled)} · ${fmtRelative(s.start_scheduled)}`;
+  }else{
+    badge=<span className="badge">📼 已結束</span>;
+    when=`${fmtClock(s.available_at)} · ${fmtDuration(s.duration)}${fmtRelative(s.available_at)?' · '+fmtRelative(s.available_at):''}`;
+  }
+  return(
+    <a className={`stream-card ${kind==='live'?'live-card':''}`} href={url} target="_blank" rel="noreferrer">
+      <img className="stream-thumb" src={thumb} alt="" loading="lazy"/>
+      <div className="stream-info">
+        <div className="stream-title">{s.title||'(無標題)'}</div>
+        <div className="stream-meta">{badge}{when}</div>
+      </div>
+    </a>
+  );
+}
+
+function StreamsForMember({member}){
+  const[streams,setStreams]=useState(null);
+  useEffect(()=>{loadStreams().then(setStreams);},[]);
+
+  const filtered=useMemo(()=>{
+    if(!streams) return null;
+    const live=(streams.live||[]).filter(s=>matchChannel(s.channel,member));
+    const upcoming=(streams.upcoming||[]).filter(s=>matchChannel(s.channel,member));
+    const past=(streams.past||[]).filter(s=>matchChannel(s.channel,member)).slice(0,5);
+    return {live,upcoming,past,lastUpdated:streams.lastUpdated};
+  },[streams,member]);
+
+  if(streams===null) return null;  // 還沒載完，靜默
+  if(!filtered||(!filtered.live.length&&!filtered.upcoming.length&&!filtered.past.length)){
+    return null;  // 完全沒資料就不顯示這區
+  }
+
+  return(
+    <div style={{marginBottom:24}}>
+      {filtered.live.length>0&&(
+        <div className="stream-sec">
+          <div className="stream-hdr live">
+            <span className="live-dot"></span>直播中
+            <span className="pill">{filtered.live.length}</span>
+          </div>
+          {filtered.live.map(s=><StreamCard key={s.id} s={s} kind="live"/>)}
+        </div>
+      )}
+      {filtered.upcoming.length>0&&(
+        <div className="stream-sec">
+          <div className="stream-hdr">
+            ⏰ 接下來
+            <span className="pill">{filtered.upcoming.length}</span>
+          </div>
+          {filtered.upcoming.slice(0,3).map(s=><StreamCard key={s.id} s={s} kind="upcoming"/>)}
+        </div>
+      )}
+      {filtered.past.length>0&&(
+        <div className="stream-sec">
+          <div className="stream-hdr">
+            📼 最近直播
+            <span className="pill">{filtered.past.length}</span>
+          </div>
+          {filtered.past.map(s=><StreamCard key={s.id} s={s} kind="past"/>)}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -376,6 +529,10 @@ function MerchPage({member}){
       <div className="store-links">
         <a className="store-link-btn" href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer">🛒 shop.nijisanji.jp 搜尋</a>
         {member.channelUrl&&<a className="store-link-btn" href={member.channelUrl} target="_blank" rel="noreferrer">▶ YouTube</a>}
+      </div>
+
+      <div style={{padding:'0 18px'}}>
+        <StreamsForMember member={member}/>
       </div>
 
       {err&&(
