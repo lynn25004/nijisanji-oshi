@@ -57,10 +57,10 @@ def gh_get(path):
 
 
 def tg_send(text):
+    # 不用 parse_mode：URL 含 underscore、版號含 + 等等容易讓 Markdown parser 噴 400
     payload = json.dumps({
         "chat_id": TG_CHAT,
         "text": text,
-        "parse_mode": "Markdown",
         "disable_web_page_preview": True,
     }).encode()
     req = urllib.request.Request(
@@ -74,20 +74,20 @@ def tg_send(text):
 
 def main():
     issues = []
-    lines = ["🔍 *nijisanji-oshi 通知系統健康檢查*", ""]
+    lines = ["🔍 nijisanji-oshi 通知系統健康檢查", ""]
 
     # 1. Supabase oshi_known_products 件數
     try:
         _, known_total = sb_get("oshi_known_products", {"select": "product_code", "limit": "1"})
         growth = known_total - BASELINE
         emoji = "✅" if growth > 0 else "⚠️"
-        lines.append(f"{emoji} *商品快照*：{known_total} 件（vs 基線 {BASELINE}，新增 {growth}）")
+        lines.append(f"{emoji} 商品快照：{known_total} 件（vs 基線 {BASELINE}，新增 {growth}）")
         if growth == 0:
             issues.append("商品快照沒成長 → products.json 可能沒更新或 build_products.py 壞了")
         elif growth < 0:
             issues.append(f"商品快照少了 {-growth} 件（不該發生）")
     except Exception as e:
-        lines.append(f"❌ *商品快照*：查詢失敗 {e}")
+        lines.append(f"❌ 商品快照：查詢失敗 {e}")
         issues.append(f"Supabase 查詢失敗：{e}")
 
     # 2. oshi_notify_log 過去 30 天
@@ -99,11 +99,11 @@ def main():
             "notified_at": f"gte.{since}",
         })
         emoji = "✅" if sent_total > 0 else "ℹ️"
-        lines.append(f"{emoji} *過去 30 天通知*：{sent_total} 封")
+        lines.append(f"{emoji} 過去 30 天通知：{sent_total} 封")
         if sent_total == 0:
             issues.append("30 天內沒寄過任何通知 → 可能沒人訂閱、或商店真的沒新品、或寄信壞了")
     except Exception as e:
-        lines.append(f"❌ *通知紀錄*：查詢失敗 {e}")
+        lines.append(f"❌ 通知紀錄：查詢失敗 {e}")
         issues.append(f"notify_log 查詢失敗：{e}")
 
     # 3. notify_new_products workflow 最近 30 次
@@ -113,7 +113,7 @@ def main():
         success = sum(1 for r in items if r.get("conclusion") == "success")
         failure = sum(1 for r in items if r.get("conclusion") == "failure")
         emoji = "✅" if failure == 0 else "❌" if failure > 5 else "⚠️"
-        lines.append(f"{emoji} *Workflow 最近 {len(items)} 次*：成功 {success}、失敗 {failure}")
+        lines.append(f"{emoji} Workflow 最近 {len(items)} 次：成功 {success}、失敗 {failure}")
         if failure > 0:
             recent_fail = [r for r in items if r.get("conclusion") == "failure"][:3]
             for f in recent_fail:
@@ -122,7 +122,7 @@ def main():
             if failure > 5:
                 issues.append(f"workflow 失敗 {failure} 次（可能 secret 過期、API 變動）")
     except Exception as e:
-        lines.append(f"❌ *Workflow 查詢失敗*：{e}")
+        lines.append(f"❌ Workflow 查詢失敗：{e}")
         issues.append(f"GitHub API 查詢失敗：{e}")
 
     # 4. 訂閱者統計（順手看一下）
@@ -133,21 +133,21 @@ def main():
             "limit": "1",
             "email_enabled": "eq.true",
         })
-        lines.append(f"📊 *訂閱*：{sub_total} 條訂閱、{notify_on} 人開啟通知")
+        lines.append(f"📊 訂閱：{sub_total} 條訂閱、{notify_on} 人開啟通知")
     except Exception as e:
         lines.append(f"⚠️ 訂閱統計查詢失敗：{e}")
 
     # 結論
     lines.append("")
     if not issues:
-        lines.append("🎉 *結論：系統健康*")
+        lines.append("🎉 結論：系統健康")
     else:
-        lines.append("🔧 *建議調查*：")
+        lines.append("🔧 建議調查：")
         for i in issues:
             lines.append(f"   • {i}")
 
     lines.append("")
-    lines.append(f"_時間：{datetime.now(timezone.utc).isoformat(timespec='seconds')}_")
+    lines.append(f"時間：{datetime.now(timezone.utc).isoformat(timespec='seconds')}")
 
     text = "\n".join(lines)
     print(text)
