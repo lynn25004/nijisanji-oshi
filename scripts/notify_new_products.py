@@ -23,11 +23,11 @@ ROOT = SCRIPT_DIR.parent
 PRODUCTS_FILE = ROOT / "data" / "products.json"
 MEMBERS_FILE = ROOT / "data" / "members.json"
 
-SUPABASE_URL = os.environ["SUPABASE_URL"].rstrip("/")
-SUPABASE_KEY = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
-RESEND_KEY = os.environ["RESEND_API_KEY"]
-FROM_EMAIL = os.environ.get("NOTIFY_FROM_EMAIL", "onboarding@resend.dev")
-SITE_URL = os.environ.get("SITE_URL", "https://lynn25004.github.io/nijisanji-oshi/")
+SUPABASE_URL = os.environ["SUPABASE_URL"].strip().rstrip("/")
+SUPABASE_KEY = os.environ["SUPABASE_SERVICE_ROLE_KEY"].strip()
+RESEND_KEY = os.environ["RESEND_API_KEY"].strip()
+FROM_EMAIL = os.environ.get("NOTIFY_FROM_EMAIL", "onboarding@resend.dev").strip()
+SITE_URL = os.environ.get("SITE_URL", "https://lynn25004.github.io/nijisanji-oshi/").strip()
 
 SB_HEADERS = {
     "apikey": SUPABASE_KEY,
