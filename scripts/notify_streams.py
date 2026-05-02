@@ -65,14 +65,16 @@ def sb_request(method, path, body=None, params=None, prefer=None):
 # ========== Holodex ==========
 def fetch_holodex_streams():
     """抓 Nijisanji 即將開播 + 正在直播"""
-    print(f"[diag] HOLODEX_KEY len={len(HOLODEX_KEY)}, first8={HOLODEX_KEY[:8]!r}, last4={HOLODEX_KEY[-4:]!r}",
-          file=sys.stderr)
     out = []
     for status in ("upcoming", "live"):
         try:
             req = urllib.request.Request(
                 f"https://holodex.net/api/v2/live?org=Nijisanji&type=stream&status={status}&limit=200",
-                headers={"X-APIKEY": HOLODEX_KEY},
+                headers={
+                    "X-APIKEY": HOLODEX_KEY,
+                    "User-Agent": "nijisanji-oshi-bot/1.0 (+https://lynn25004.github.io/nijisanji-oshi/)",
+                    "Accept": "application/json",
+                },
             )
             with urllib.request.urlopen(req, timeout=20) as r:
                 items = json.loads(r.read().decode("utf-8"))
