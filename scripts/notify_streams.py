@@ -330,21 +330,28 @@ def render_email_html(stream_hits, member_by_id):
     for stream, hit_mids in stream_hits:
         ch = stream.get("channel", {})
         when = fmt_time(stream.get("start_scheduled") or stream.get("available_at", ""))
-        kind = "🔴 LIVE 中" if stream["_kind"] == "live" else f"⏰ {when} 開播"
+        is_live = stream["_kind"] == "live"
+        kind = "🔴 LIVE 中" if is_live else f"⏰ {when} 開播"
+        btn_text = "▶️ 立即觀看" if is_live else "🔗 前往觀看頁"
+        btn_color = "#ff4444" if is_live else "#ff6b9d"
         title = (stream.get("title") or "(無標題)").replace("<", "&lt;")
         thumb = f"https://i.ytimg.com/vi/{stream['id']}/mqdefault.jpg"
         url = f"https://www.youtube.com/watch?v={stream['id']}"
         names = "、".join(member_by_id[mid].get("name", mid) for mid in hit_mids if mid in member_by_id)
         rows_html += f"""
-        <tr><td style="padding:10px;border-bottom:1px solid #2e2e48">
-          <a href="{url}" style="display:flex;text-decoration:none;color:#e8e8f0;gap:12px">
-            <img src="{thumb}" width="120" height="68" style="border-radius:6px;background:#222"/>
-            <div style="flex:1">
-              <div style="font-weight:600;margin-bottom:4px">{title}</div>
+        <tr><td style="padding:14px 10px;border-bottom:1px solid #2e2e48">
+          <a href="{url}" style="display:flex;text-decoration:none;color:#e8e8f0;gap:12px;margin-bottom:10px">
+            <img src="{thumb}" width="120" height="68" style="border-radius:6px;background:#222;flex-shrink:0"/>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:600;margin-bottom:4px;line-height:1.4">{title}</div>
               <div style="font-size:12px;color:#9999bb">{kind} · {names}</div>
               <div style="font-size:11px;color:#666;margin-top:2px">{ch.get('name','')}</div>
             </div>
           </a>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <a href="{url}" style="display:inline-block;background:{btn_color};color:#fff;padding:8px 16px;border-radius:18px;text-decoration:none;font-size:13px;font-weight:600">{btn_text}</a>
+            <a href="{url}" style="font-size:11px;color:#9999bb;text-decoration:underline;word-break:break-all">{url}</a>
+          </div>
         </td></tr>"""
 
     return f"""<!doctype html>
@@ -367,12 +374,15 @@ def render_push_payload(stream, hit_mids, member_by_id):
     when = fmt_time(stream.get("start_scheduled") or stream.get("available_at", ""))
     kind_tag = "🔴 LIVE" if stream["_kind"] == "live" else f"⏰ {when}"
     names = "、".join(member_by_id[mid].get("name", mid) for mid in hit_mids if mid in member_by_id)
+    title_text = (stream.get("title") or "").strip()
+    # body 最後加「點擊觀看」提示，讓使用者知道通知是可點的
+    body = f"{title_text[:90]}\n👉 點擊前往 YouTube 觀看"
     return {
         "title": f"{kind_tag} {names}",
-        "body": (stream.get("title") or "")[:120],
+        "body": body,
         "icon": f"https://i.ytimg.com/vi/{stream['id']}/mqdefault.jpg",
         "url": f"https://www.youtube.com/watch?v={stream['id']}",
-        "tag": stream["id"],  # 同一場 stream 不會重複跳
+        "tag": stream["id"],
     }
 
 

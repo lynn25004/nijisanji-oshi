@@ -175,14 +175,18 @@ def send_email(to_email, products, member_id_to_name):
         url = p.get("url") or ""
         talents = "、".join(p.get("talents", []))
         rows_html += f"""
-        <tr><td style="padding:10px;border-bottom:1px solid #2e2e48;vertical-align:top">
-          <a href="{url}" style="display:flex;text-decoration:none;color:#e8e8f0;gap:12px">
-            <img src="{img}" width="80" height="80" style="border-radius:8px;object-fit:cover;background:#222"/>
-            <div style="flex:1">
-              <div style="font-weight:600;margin-bottom:4px">{title}</div>
+        <tr><td style="padding:14px 10px;border-bottom:1px solid #2e2e48;vertical-align:top">
+          <a href="{url}" style="display:flex;text-decoration:none;color:#e8e8f0;gap:12px;margin-bottom:10px">
+            <img src="{img}" width="80" height="80" style="border-radius:8px;object-fit:cover;background:#222;flex-shrink:0"/>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:600;margin-bottom:4px;line-height:1.4">{title}</div>
               <div style="font-size:12px;color:#9999bb">{talents}</div>
             </div>
           </a>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <a href="{url}" style="display:inline-block;background:#ff6b9d;color:#fff;padding:7px 14px;border-radius:16px;text-decoration:none;font-size:12px;font-weight:600">🛍️ 前往商品頁</a>
+            <a href="{url}" style="font-size:11px;color:#9999bb;text-decoration:underline;word-break:break-all">{url}</a>
+          </div>
         </td></tr>"""
 
     html = f"""<!doctype html>
