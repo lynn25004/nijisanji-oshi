@@ -29,6 +29,15 @@ RESEND_KEY = os.environ["RESEND_API_KEY"].strip()
 FROM_EMAIL = os.environ.get("NOTIFY_FROM_EMAIL", "onboarding@resend.dev").strip()
 SITE_URL = os.environ.get("SITE_URL", "https://lynn25004.github.io/nijisanji-oshi/").strip()
 
+# 診斷：檢查 secret 是否含非法字元（不洩漏內容）
+def _diag(name, val):
+    bad = [(i, c, ord(c)) for i, c in enumerate(val) if ord(c) < 32 or ord(c) > 126]
+    print(f"[diag] {name}: len={len(val)}, bad_chars={bad[:5]}", file=sys.stderr)
+
+_diag("SUPABASE_URL", SUPABASE_URL)
+_diag("SUPABASE_KEY", SUPABASE_KEY)
+_diag("RESEND_KEY", RESEND_KEY)
+
 SB_HEADERS = {
     "apikey": SUPABASE_KEY,
     "Authorization": f"Bearer {SUPABASE_KEY}",
