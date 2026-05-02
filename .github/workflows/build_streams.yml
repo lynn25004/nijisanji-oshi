@@ -34,9 +34,6 @@ jobs:
           git config --local user.name "GitHub Actions"
           git fetch origin data
           git worktree add /tmp/dwt origin/data
-          git config --local user.name "GitHub Actions"
-          git fetch origin data
-          git worktree add /tmp/dwt origin/data
           cp /tmp/streams.json /tmp/dwt/streams.json
           cd /tmp/dwt
           git add streams.json
