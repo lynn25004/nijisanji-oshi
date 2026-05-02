@@ -2,7 +2,7 @@ name: 每小時更新直播資料 (data/streams.json)
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 
 concurrency:
