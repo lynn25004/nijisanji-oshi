@@ -7,6 +7,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet"/>
   <style>
     :root{--bg:#0d0d14;--bg2:#13131f;--bg3:#1a1a2e;--accent1:#ff6b9d;--accent2:#c77dff;--accent3:#48cae4;--text:#e8e8f0;--text2:#9999bb;--card-bg:#1e1e30;--card-border:#2e2e48}
@@ -106,6 +107,29 @@
     .store-link-btn{display:inline-flex;align-items:center;gap:6px;background:var(--card-bg);border:1px solid var(--card-border);color:var(--text);padding:8px 16px;border-radius:20px;font-size:12px;text-decoration:none;transition:all .2s}
     .store-link-btn:hover{border-color:var(--accent2)}
     .fetch-status{font-size:10px;color:var(--text2);padding:0 18px 8px}
+    .auth-btn{background:linear-gradient(135deg,var(--accent1),var(--accent2));border:none;color:#fff;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;transition:transform .15s}
+    .auth-btn:hover{transform:translateY(-1px)}
+    .auth-pill{display:flex;align-items:center;gap:8px;background:var(--card-bg);border:1px solid var(--card-border);padding:4px 4px 4px 10px;border-radius:20px;font-size:11px;color:var(--text2)}
+    .auth-pill .auth-email{color:var(--text);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .auth-pill .auth-logout{background:transparent;border:none;color:var(--text2);cursor:pointer;font-size:11px;padding:2px 8px;border-radius:12px}
+    .auth-pill .auth-logout:hover{background:var(--card-border);color:var(--accent1)}
+    .notify-row{display:flex;align-items:center;gap:8px;background:var(--card-bg);border:1px solid var(--card-border);padding:10px 14px;border-radius:12px;margin:0 0 14px;font-size:13px}
+    .notify-row .nt-label{flex:1;color:var(--text)}
+    .notify-row .nt-sub{font-size:11px;color:var(--text2);margin-top:2px}
+    .modal-bd{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:300;backdrop-filter:blur(4px);padding:20px}
+    .modal{background:var(--bg2);border:1px solid var(--card-border);border-radius:16px;padding:24px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .modal h2{font-size:18px;margin-bottom:6px}
+    .modal p{font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5}
+    .modal input{width:100%;background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:10px 14px;border-radius:10px;font-size:14px;outline:none;margin-bottom:12px;font-family:inherit}
+    .modal input:focus{border-color:var(--accent2)}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end}
+    .modal-actions button{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:inherit}
+    .modal-cancel{background:var(--card-bg);color:var(--text2)}
+    .modal-submit{background:linear-gradient(135deg,var(--accent1),var(--accent2));color:#fff;font-weight:600}
+    .modal-submit:disabled{opacity:.5;cursor:not-allowed}
+    .modal-msg{font-size:12px;padding:8px 12px;border-radius:8px;margin-top:10px;line-height:1.5}
+    .modal-msg.ok{background:rgba(105,219,124,.15);color:#69db7c}
+    .modal-msg.err{background:rgba(255,107,107,.15);color:#ff6b6b}
   </style>
 </head>
 <body>
@@ -113,6 +137,12 @@
 <div id="root"></div>
 <script type="text/babel">
 const {useState,useEffect,useCallback,useMemo,useRef}=React;
+
+const SUPABASE_URL='https://fntotxazjfkzwejotxac.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_2mMxRnHZLrIJCOfWlniPfA_XHDh0LGi';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true}
+});
 
 const STORE='https://shop.nijisanji.jp';
 // 商品資料由 GitHub Actions 預先抓 shop.nijisanji.jp 全部商品 → data/products.json
@@ -251,7 +281,7 @@ function MerchPage({member}){
   );
 }
 
-function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyShared}){
+function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyShared,notifyOn,onToggleNotify,loggedIn,onLoginClick}){
   const list=members.filter(m=>oshiIds.has(m.id));
   const[copyMsg,setCopyMsg]=useState('');
   const share=async()=>{
@@ -280,6 +310,17 @@ function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyS
           </button>
           {copyMsg&&<div style={{marginTop:6,fontSize:11,color:'var(--text2)'}}>{copyMsg}</div>}
         </div>
+      )}
+      {!isShared&&list.length>0&&(
+        loggedIn
+          ? <NotifyToggle enabled={notifyOn} onChange={onToggleNotify}/>
+          : <div className="notify-row" onClick={onLoginClick} style={{cursor:'pointer'}}>
+              <div>
+                <div className="nt-label">🔔 想要新品通知？</div>
+                <div className="nt-sub">登入後可訂閱 email，每小時檢查一次</div>
+              </div>
+              <button className="auth-btn">登入</button>
+            </div>
       )}
       <div className="oshi-grid">
         {list.map(m=>{
@@ -359,11 +400,75 @@ function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi}){
   );
 }
 
+function LoginModal({onClose}){
+  const[email,setEmail]=useState('');
+  const[sending,setSending]=useState(false);
+  const[msg,setMsg]=useState(null);
+  const submit=async()=>{
+    if(!email.trim()) return;
+    setSending(true);setMsg(null);
+    const{error}=await sb.auth.signInWithOtp({
+      email:email.trim(),
+      options:{emailRedirectTo:location.origin+location.pathname}
+    });
+    setSending(false);
+    if(error) setMsg({type:'err',text:'寄送失敗：'+error.message});
+    else setMsg({type:'ok',text:'已寄出登入連結！請去 '+email+' 收信，點開連結即可登入（5 分鐘內有效）'});
+  };
+  return(
+    <div className="modal-bd" onClick={e=>{if(e.target===e.currentTarget) onClose();}}>
+      <div className="modal">
+        <h2>登入 / 註冊</h2>
+        <p>輸入 email，我會寄一封登入連結給你。第一次使用會自動註冊，跨裝置同步推し清單與訂閱新品通知。</p>
+        <input type="email" placeholder="your@email.com" value={email}
+          onChange={e=>setEmail(e.target.value)}
+          onKeyDown={e=>{if(e.key==='Enter') submit();}} autoFocus/>
+        <div className="modal-actions">
+          <button className="modal-cancel" onClick={onClose}>取消</button>
+          <button className="modal-submit" onClick={submit} disabled={sending||!email.trim()}>
+            {sending?'寄送中…':'寄登入連結'}
+          </button>
+        </div>
+        {msg&&<div className={`modal-msg ${msg.type}`}>{msg.text}</div>}
+      </div>
+    </div>
+  );
+}
+
+function AuthBar({session,onLogin,onLogout}){
+  if(!session) return <button className="auth-btn" onClick={onLogin}>登入 / 註冊</button>;
+  return(
+    <div className="auth-pill" title={session.user.email}>
+      <span>👤</span>
+      <span className="auth-email">{session.user.email}</span>
+      <button className="auth-logout" onClick={onLogout}>登出</button>
+    </div>
+  );
+}
+
+function NotifyToggle({enabled,onChange,disabled}){
+  return(
+    <div className="notify-row">
+      <div>
+        <div className="nt-label">🔔 新品上架時 email 通知我</div>
+        <div className="nt-sub">{disabled?'登入後即可開啟':'每小時檢查一次，shop.nijisanji.jp 有你推的成員新商品時會寄信給你'}</div>
+      </div>
+      <label className="toggle-label" onClick={()=>!disabled&&onChange(!enabled)} style={{opacity:disabled?.4:1,cursor:disabled?'not-allowed':'pointer'}}>
+        <span className={`toggle-sw ${enabled?'on':''}`}></span>
+      </label>
+    </div>
+  );
+}
+
 function App(){
   const[members,setMembers]=useState([]);
   const[lastUpdated,setLastUpdated]=useState('');
   const[loading,setLoading]=useState(true);
   const[curMember,setCurMember]=useState(null);
+  const[session,setSession]=useState(null);
+  const[showLogin,setShowLogin]=useState(false);
+  const[notifyOn,setNotifyOn]=useState(false);
+  const syncedRef=useRef(false);
   // 解析分享連結 ?oshi=id1,id2,id3
   const sharedIds=(()=>{
     try{
@@ -393,8 +498,75 @@ function App(){
       setMembers(s);setLastUpdated(d.lastUpdated||'');
     }).catch(()=>setMembers([])).finally(()=>setLoading(false));
   },[]);
-  const toggleOshi=useCallback(id=>setOshiIds(prev=>{const n=new Set(prev);n.has(id)?n.delete(id):n.add(id);return n;}),[]);
-  const removeOshi=useCallback(id=>setOshiIds(prev=>{const n=new Set(prev);n.delete(id);return n;}),[]);
+
+  // ─── Supabase auth + sync ───
+  useEffect(()=>{
+    sb.auth.getSession().then(({data})=>setSession(data.session));
+    const{data:sub}=sb.auth.onAuthStateChange((_e,s)=>{
+      setSession(s);
+      if(!s){syncedRef.current=false;setNotifyOn(false);}
+    });
+    return()=>sub.subscription.unsubscribe();
+  },[]);
+
+  // 登入後：拉 Supabase 訂閱清單 → merge 進本機（第一次同步：以本機 + 雲端聯集為準）
+  useEffect(()=>{
+    if(!session||isShared||syncedRef.current) return;
+    syncedRef.current=true;
+    (async()=>{
+      const[{data:subs},{data:settings}]=await Promise.all([
+        sb.from('oshi_subscriptions').select('member_id').eq('user_id',session.user.id),
+        sb.from('oshi_notify_settings').select('email_enabled').eq('user_id',session.user.id).maybeSingle()
+      ]);
+      const remote=new Set((subs||[]).map(r=>r.member_id));
+      const local=new Set(oshiIds);
+      // 第一次登入：合併兩邊。之後本機就跟雲端一致了
+      const merged=new Set([...local,...remote]);
+      setOshiIds(merged);
+      // 把本機有但雲端沒有的塞回雲端
+      const toInsert=[...local].filter(id=>!remote.has(id));
+      if(toInsert.length){
+        await sb.from('oshi_subscriptions').insert(toInsert.map(member_id=>({user_id:session.user.id,member_id})));
+      }
+      setNotifyOn(!!settings?.email_enabled);
+    })();
+  },[session,isShared]);
+
+  const toggleOshi=useCallback(id=>{
+    setOshiIds(prev=>{
+      const n=new Set(prev);
+      const had=n.has(id);
+      had?n.delete(id):n.add(id);
+      // 同步到 Supabase（登入時）
+      if(session&&!isShared){
+        if(had) sb.from('oshi_subscriptions').delete().eq('user_id',session.user.id).eq('member_id',id).then(()=>{});
+        else sb.from('oshi_subscriptions').insert({user_id:session.user.id,member_id:id}).then(()=>{});
+      }
+      return n;
+    });
+  },[session,isShared]);
+  const removeOshi=useCallback(id=>{
+    setOshiIds(prev=>{const n=new Set(prev);n.delete(id);return n;});
+    if(session&&!isShared){
+      sb.from('oshi_subscriptions').delete().eq('user_id',session.user.id).eq('member_id',id).then(()=>{});
+    }
+  },[session,isShared]);
+
+  const toggleNotify=useCallback(async(v)=>{
+    setNotifyOn(v);
+    if(!session) return;
+    await sb.from('oshi_notify_settings').upsert({
+      user_id:session.user.id,
+      email_enabled:v,
+      updated_at:new Date().toISOString()
+    });
+  },[session]);
+
+  const logout=useCallback(async()=>{
+    await sb.auth.signOut();
+    // 登出後保留本機 oshiIds，但清除通知設定
+    setNotifyOn(false);
+  },[]);
   const titles={select:'彩虹社推し選擇器',oshi:'我的推し',merch:curMember?.name||'商品'};
   if(loading)return <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'80vh'}}><div className="spinner"></div></div>;
   return(
@@ -405,11 +577,13 @@ function App(){
         <div className="header-right">
           {view==='merch'&&<button className="back-btn" onClick={()=>setView('oshi')}>← 返回</button>}
           {view==='oshi'&&<button className="back-btn" onClick={()=>setView('select')}>← 選擇成員</button>}
+          <AuthBar session={session} onLogin={()=>setShowLogin(true)} onLogout={logout}/>
         </div>
       </div>
       {view==='select'&&<MemberSelect members={members} lastUpdated={lastUpdated} oshiIds={oshiIds} onToggle={toggleOshi} onViewOshi={()=>setView('oshi')}/>}
-      {view==='oshi'&&<OshiPage members={members} oshiIds={oshiIds} onRemove={removeOshi} onViewMerch={m=>{setCurMember(m);setView('merch');}} onBack={()=>setView('select')} isShared={isShared} onApplyShared={applySharedToSelf}/>}
+      {view==='oshi'&&<OshiPage members={members} oshiIds={oshiIds} onRemove={removeOshi} onViewMerch={m=>{setCurMember(m);setView('merch');}} onBack={()=>setView('select')} isShared={isShared} onApplyShared={applySharedToSelf} notifyOn={notifyOn} onToggleNotify={toggleNotify} loggedIn={!!session} onLoginClick={()=>setShowLogin(true)}/>}
       {view==='merch'&&curMember&&<MerchPage member={curMember}/>}
+      {showLogin&&<LoginModal onClose={()=>setShowLogin(false)}/>}
     </div>
   );
 }
