@@ -23,20 +23,17 @@ ROOT = SCRIPT_DIR.parent
 PRODUCTS_FILE = ROOT / "data" / "products.json"
 MEMBERS_FILE = ROOT / "data" / "members.json"
 
-SUPABASE_URL = os.environ["SUPABASE_URL"].strip().rstrip("/")
-SUPABASE_KEY = os.environ["SUPABASE_SERVICE_ROLE_KEY"].strip()
-RESEND_KEY = os.environ["RESEND_API_KEY"].strip()
+import re
+
+def _clean(val):
+    """移除所有空白字元（GitHub Secrets UI 貼長字串會自動換行插入 \n）"""
+    return re.sub(r"\s+", "", val)
+
+SUPABASE_URL = _clean(os.environ["SUPABASE_URL"]).rstrip("/")
+SUPABASE_KEY = _clean(os.environ["SUPABASE_SERVICE_ROLE_KEY"])
+RESEND_KEY = _clean(os.environ["RESEND_API_KEY"])
 FROM_EMAIL = os.environ.get("NOTIFY_FROM_EMAIL", "onboarding@resend.dev").strip()
 SITE_URL = os.environ.get("SITE_URL", "https://lynn25004.github.io/nijisanji-oshi/").strip()
-
-# 診斷：檢查 secret 是否含非法字元（不洩漏內容）
-def _diag(name, val):
-    bad = [(i, c, ord(c)) for i, c in enumerate(val) if ord(c) < 32 or ord(c) > 126]
-    print(f"[diag] {name}: len={len(val)}, bad_chars={bad[:5]}", file=sys.stderr)
-
-_diag("SUPABASE_URL", SUPABASE_URL)
-_diag("SUPABASE_KEY", SUPABASE_KEY)
-_diag("RESEND_KEY", RESEND_KEY)
 
 SB_HEADERS = {
     "apikey": SUPABASE_KEY,
