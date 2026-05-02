@@ -65,6 +65,8 @@ def sb_request(method, path, body=None, params=None, prefer=None):
 # ========== Holodex ==========
 def fetch_holodex_streams():
     """抓 Nijisanji 即將開播 + 正在直播"""
+    print(f"[diag] HOLODEX_KEY len={len(HOLODEX_KEY)}, first8={HOLODEX_KEY[:8]!r}, last4={HOLODEX_KEY[-4:]!r}",
+          file=sys.stderr)
     out = []
     for status in ("upcoming", "live"):
         try:
