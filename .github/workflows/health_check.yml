@@ -2,7 +2,6 @@ name: 一個月後健康檢查（推 Telegram）
 
 on:
   schedule:
-    # 每年 6/2 早上 9:00 (UTC+8) = 1:00 UTC
     - cron: "0 1 2 6 *"
   workflow_dispatch:
 
@@ -13,16 +12,6 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: 跑健康檢查
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
