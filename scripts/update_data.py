@@ -64,7 +64,8 @@ def scrape():
         if "NIJISANJI EN" in affil or " EN" in affil:
             branch = "EN"
         elif "VirtuaReal" in affil:
-            branch = "VR"
+            # 跳過 VR 分部（使用者不追）
+            continue
         else:
             branch = "JP"
 

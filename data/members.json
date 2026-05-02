@@ -596,17 +596,6 @@
       "channelUrl": ""
     },
     {
-      "id": "eine",
-      "name": "艾因",
-      "nameEn": "Eine",
-      "branch": "VR",
-      "debutDate": "2019-05-06",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/096a6c4a5bef41798cd482bad96ea96a/liver-face_Eine.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "ex-albio",
       "name": "エクス・アルビオ",
       "nameEn": "Ex Albio",
@@ -624,28 +613,6 @@
       "branch": "JP",
       "debutDate": "2019-05-17",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/a2d250273e0f4146990ebac2d5d1ce8d/liver-face_Levi_Elipha.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "nanami",
-      "name": "七海",
-      "nameEn": "Nanami",
-      "branch": "VR",
-      "debutDate": "2019-06-11",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/261d37057554476aa036967a5a1c5248/liver-face_Nanami.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "kouichi",
-      "name": "光一",
-      "nameEn": "Kouichi",
-      "branch": "VR",
-      "debutDate": "2019-06-11",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/4d9a67a52983443f9bafafcece1434c0/liver-face_Kouichi.png.webp",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -761,17 +728,6 @@
       "channelUrl": ""
     },
     {
-      "id": "waku",
-      "name": "惑姫",
-      "nameEn": "Waku",
-      "branch": "VR",
-      "debutDate": "2019-09-16",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/d66c850d52864249a5c6baeb8265aa8f/liver-face_Waku.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "kana-sukoya",
       "name": "健屋花那",
       "nameEn": "Sukoya Kana",
@@ -871,39 +827,6 @@
       "channelUrl": ""
     },
     {
-      "id": "tabibito",
-      "name": "度人",
-      "nameEn": "Tabibito",
-      "branch": "VR",
-      "debutDate": "2019-11-20",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/98d49949f4c3426f99b91b98016b94f9/liver-face_Tabibito.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "aza",
-      "name": "阿萨",
-      "nameEn": "Aza",
-      "branch": "VR",
-      "debutDate": "2019-11-20",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/45880475d7fb40a0be425b5f46417643/liver-face_Aza.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "yagi",
-      "name": "八木迪之",
-      "nameEn": "Yagi",
-      "branch": "VR",
-      "debutDate": "2019-11-20",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/542ec9849a1a41f884eede1a5d09ffa1/liver-face_Yagi.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "minato-fuwa",
       "name": "不破湊",
       "nameEn": "Fuwa Minato",
@@ -954,28 +877,6 @@
       "branch": "JP",
       "debutDate": "2019-12-25",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/ef419dca96cd46af9511ee6393562dfe/liver-face_Natsume_Kurusu.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "saya",
-      "name": "沙夜",
-      "nameEn": "Saya",
-      "branch": "VR",
-      "debutDate": "2020-01-14",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/0b49792ba797429b88156fc05bc67b95/liver-face_Saya.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "yukie",
-      "name": "雪绘",
-      "nameEn": "Yukie",
-      "branch": "VR",
-      "debutDate": "2020-01-14",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/8448a32ad4c042c182fbe8d885a3dc2c/liver-face_Yukie.png.webp",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -1091,17 +992,6 @@
       "channelUrl": ""
     },
     {
-      "id": "chiharu",
-      "name": "千春",
-      "nameEn": "Chiharu",
-      "branch": "VR",
-      "debutDate": "2020-07-20",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/526768a3844e4c83b29f4df3c2cb6547/liver-face_Chiharu.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "chigusa-nishizono",
       "name": "西園チグサ",
       "nameEn": "Nishizono Chigusa",
@@ -1179,28 +1069,6 @@
       "channelUrl": ""
     },
     {
-      "id": "yua",
-      "name": "悠亚",
-      "nameEn": "Yua",
-      "branch": "VR",
-      "debutDate": "2020-09-20",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/fac8e617a29042f59c59bd521ccb78d3/liver-face_Yua.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "shaun",
-      "name": "勺",
-      "nameEn": "Shaun",
-      "branch": "VR",
-      "debutDate": "2020-09-20",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/04f0e3f8911140028d0fdf7e36ecb063/liver-face_Shaun.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "yang-nari",
       "name": "ヤン ナリ",
       "nameEn": "Yang Nari",
@@ -1256,56 +1124,12 @@
       "channelUrl": ""
     },
     {
-      "id": "chiyuu",
-      "name": "千幽",
-      "nameEn": "Chiyuu",
-      "branch": "VR",
-      "debutDate": "2020-12-05",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/275a8b92d6e8475c8911978322ebd4db/liver-face_Chiyuu.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "mayumi",
-      "name": "勾檀",
-      "nameEn": "Mayumi",
-      "branch": "VR",
-      "debutDate": "2021-03-04",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/44cc258438b744d8b08748669ff24aef/liver-face_Mayumi.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "seffyna",
       "name": "セフィナ",
       "nameEn": "Seffyna",
       "branch": "JP",
       "debutDate": "2021-04-30",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/b1a1d6c519e94e458d216b027f37ceee/liver-face_Seffyna.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "kiti",
-      "name": "吉吉",
-      "nameEn": "Kiti",
-      "branch": "VR",
-      "debutDate": "2021-05-01",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/9ff4528e4f8f4e6a98c1a9e7d4ca54e4/liver-face_Kiti.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "tocci",
-      "name": "桃星",
-      "nameEn": "Tocci",
-      "branch": "VR",
-      "debutDate": "2021-05-01",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/c364ec5d83194ad9b4edd033fe89e5dc/liver-face_Tocci.png",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -1339,17 +1163,6 @@
       "branch": "EN",
       "debutDate": "2021-07-18",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/c11417fb94b04f27aaca9a698861286e/liver-face_Petra_Gurin.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "rhea",
-      "name": "瑞娅",
-      "nameEn": "Rhea",
-      "branch": "VR",
-      "debutDate": "2021-07-19",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/f02de8db255d46c6861066b58f231eaa/liver-face_Rhea.png",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -1421,28 +1234,6 @@
       "channelUrl": ""
     },
     {
-      "id": "yog",
-      "name": "尤格",
-      "nameEn": "Yog",
-      "branch": "VR",
-      "debutDate": "2021-09-24",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/45205d834d844e84888716570e5d9a7b/liver-face_Yog.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "hunger",
-      "name": "暴食",
-      "nameEn": "Hunger",
-      "branch": "VR",
-      "debutDate": "2021-09-24",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/eb8bf7e87e18465ba283cef6d539aede/liver-face_Hunger.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "enna-alouette",
       "name": "エナー・アールウェット",
       "nameEn": "Enna Alouette",
@@ -1493,28 +1284,6 @@
       "branch": "EN",
       "debutDate": "2021-12-19",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/57f8266ce45a4ace95f272c19e032413/liver-face_ShuYamino.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "sybil",
-      "name": "希维",
-      "nameEn": "Sybil",
-      "branch": "VR",
-      "debutDate": "2022-01-02",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/5ec4c743af2d45a5bd8a2cdb987c5816/liver-face_Sibil.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "girimi",
-      "name": "雾深",
-      "nameEn": "Girimi",
-      "branch": "VR",
-      "debutDate": "2022-01-02",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/6c6b6d75ff8e447db8a024c7184ad8f4/liver-face_Girimi.png.webp",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -1685,28 +1454,6 @@
       "channelUrl": ""
     },
     {
-      "id": "sui",
-      "name": "岁己",
-      "nameEn": "Sui",
-      "branch": "VR",
-      "debutDate": "2022-08-22",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/27ae81af8bbb43ee84867d6e9946eb4a/liver-face_Sui.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "leo",
-      "name": "莱恩",
-      "nameEn": "Leo",
-      "branch": "VR",
-      "debutDate": "2022-08-22",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/d3722e05610845849dbaa90822cb6cf4/liver-face_Leo.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "meloco-kyoran",
       "name": "狂蘭 メロコ",
       "nameEn": "Meloco Kyoran",
@@ -1817,17 +1564,6 @@
       "channelUrl": ""
     },
     {
-      "id": "shiori",
-      "name": "栞栞",
-      "nameEn": "Shiori",
-      "branch": "VR",
-      "debutDate": "2023-01-25",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/02067d1eb6b24429aa94c1fafe1e5621/liver-face_Shiori.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "mana-hibachi",
       "name": "緋八マナ",
       "nameEn": "Hibachi Mana",
@@ -1916,50 +1652,6 @@
       "channelUrl": ""
     },
     {
-      "id": "hatsuse",
-      "name": "初濑",
-      "nameEn": "Hatsuse",
-      "branch": "VR",
-      "debutDate": "2023-06-01",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/5f9aa5f0376a4d498df3e41b3d68cf4e/liver-face_Hatsuse.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "ameki",
-      "name": "雨纪",
-      "nameEn": "Ameki",
-      "branch": "VR",
-      "debutDate": "2023-06-01",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/a3e370d5db504b16b761bba379c1a301/liver-face_Ameki.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "awu",
-      "name": "哎小呜",
-      "nameEn": "Awu",
-      "branch": "VR",
-      "debutDate": "2023-06-01",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/07878ae182ac4a339e407972d2ac360e/liver-face_Awu.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "michiya",
-      "name": "未知夜",
-      "nameEn": "Michiya",
-      "branch": "VR",
-      "debutDate": "2023-06-01",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/7312205e9eef488ea7d82d300a8e2073/liver-face_Michiya.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "vantacrow-bringer",
       "name": "ベンタクロウ ブリンガー",
       "nameEn": "Vantacrow Bringer",
@@ -1988,72 +1680,6 @@
       "branch": "EN",
       "debutDate": "2023-06-21",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/d82003529a8f472c825834942a43c98a/liver-face_Vezalius_Bandage.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "mizuki",
-      "name": "弥月",
-      "nameEn": "Mizuki",
-      "branch": "VR",
-      "debutDate": "2023-08-25",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/cfac97b19505480dbc73a16aa49f2167/liver-face_Mizuki.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "ayumi",
-      "name": "入福步",
-      "nameEn": "Ayumi",
-      "branch": "VR",
-      "debutDate": "2023-08-25",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/baea4fdc9aa74e82a13794985b7aa8c7/liver-face_Ayumi.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "richi",
-      "name": "离枝",
-      "nameEn": "Richi",
-      "branch": "VR",
-      "debutDate": "2023-08-25",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/c3a6ccb936034a8dba31990fd1f5382e/liver-face_Richi.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "urushiha",
-      "name": "漆羽",
-      "nameEn": "Urushiha",
-      "branch": "VR",
-      "debutDate": "2023-08-25",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/d859dea99d294da6b94521ab644fa0ea/liver-face_Urushiha.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "hajime",
-      "name": "晴一",
-      "nameEn": "Hajime",
-      "branch": "VR",
-      "debutDate": "2023-08-25",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/d18c05798d734ed4810157b71d2837fa/liver-face_Hajime.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "mikoto",
-      "name": "蜜言",
-      "nameEn": "Mikoto",
-      "branch": "VR",
-      "debutDate": "2023-08-25",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/6ccbde6d4e6d4d738468b15c8d03509a/liver-face_Mikoto.png",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -2103,39 +1729,6 @@
       "channelUrl": ""
     },
     {
-      "id": "pako",
-      "name": "帕可",
-      "nameEn": "Pako",
-      "branch": "VR",
-      "debutDate": "2023-11-30",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/89a5213170134fedab53532d419cd8c0/liver-face_Pako.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "nagisa",
-      "name": "米汀",
-      "nameEn": "Nagisa",
-      "branch": "VR",
-      "debutDate": "2023-11-30",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/052bf04baef045e898900f4a1831d749/liver-face_Nagisa.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "yukisyo",
-      "name": "雪烛",
-      "nameEn": "Yukisyo",
-      "branch": "VR",
-      "debutDate": "2023-11-30",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/3f3b14474d77404888506e06703a0479/liver-face_Yukisyo.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "kaisei",
       "name": "魁星",
       "nameEn": "Kaisei",
@@ -2164,17 +1757,6 @@
       "branch": "JP",
       "debutDate": "2024-03-11",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/fa69680e8c48481d9d290762430a381d/liver-face_Yusei_Kitami.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "kima",
-      "name": "鬼间",
-      "nameEn": "Kima",
-      "branch": "VR",
-      "debutDate": "2024-05-05",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/9736984b50b4429fb3e4ea0a307b6cf6/liver-face_Kima.png",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -2257,39 +1839,6 @@
       "channelUrl": ""
     },
     {
-      "id": "susu",
-      "name": "点酥",
-      "nameEn": "Susu",
-      "branch": "VR",
-      "debutDate": "2024-07-10",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/68b2686a13e74e819c071b4e22e7b99b/liver-face_Susu.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "momoka",
-      "name": "桃代",
-      "nameEn": "Momoka",
-      "branch": "VR",
-      "debutDate": "2024-07-10",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/6b7be32474cc42108032b448e3bf4273/liver-face_Momoka.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "harei",
-      "name": "花礼",
-      "nameEn": "Harei",
-      "branch": "VR",
-      "debutDate": "2024-07-10",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/7f5223d95956498cba7a42bbf6e4bfa7/liver-face_Harei.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "suzuna-nanase",
       "name": "七瀬すず菜",
       "nameEn": "Nanase Suzuna",
@@ -2340,61 +1889,6 @@
       "branch": "JP",
       "debutDate": "2024-08-12",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/e3730f9f6b6f4428a0f5d9d135e0b1f8/liver-face_Tamako_Kirara.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "melody",
-      "name": "泽音",
-      "nameEn": "Melody",
-      "branch": "VR",
-      "debutDate": "2025-01-16",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/b56598fb7adb4776a6b4354d6440fd04/liver-face_Melody.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "mit3uri",
-      "name": "三理",
-      "nameEn": "Mit3uri",
-      "branch": "VR",
-      "debutDate": "2025-02-28",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/b1a90958c8d64ba198749c6d83706f81/liver-face_Mit3uri.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "nimue",
-      "name": "妮慕",
-      "nameEn": "Nimue",
-      "branch": "VR",
-      "debutDate": "2025-02-28",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/4c1dd2cc91604aeba58bda7ae597d4f7/liver-face_Nimue.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "mei",
-      "name": "命依",
-      "nameEn": "Mei",
-      "branch": "VR",
-      "debutDate": "2025-02-28",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/39b2caf0e9674f1093f6607ecaf7d97b/liver-face_Mei.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "meme",
-      "name": "沐毛",
-      "nameEn": "Meme",
-      "branch": "VR",
-      "debutDate": "2025-02-28",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/7804960d092e46e48f39b175db9590e6/liver-face_Meme.png",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -2461,39 +1955,6 @@
       "branch": "JP",
       "debutDate": "2025-04-10",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/3e196e23ad234fc39212007f10fa046d/liver-face_Sakyo_Itsuki.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "kioi",
-      "name": "柚雨",
-      "nameEn": "Kioi",
-      "branch": "VR",
-      "debutDate": "2025-08-01",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/dc5f62b8770d48f5837ea451327787c4/liver-face_Kioi.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "mofu",
-      "name": "犬绒",
-      "nameEn": "Mofu",
-      "branch": "VR",
-      "debutDate": "2025-08-01",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/62b38b68564648b492d74bd3f04e9f30/liver-face_Mofu.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "nori",
-      "name": "能能",
-      "nameEn": "Nori",
-      "branch": "VR",
-      "debutDate": "2025-08-01",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/64ec8e567fc34e3faa6a7dda24af1c91/liver-face_Nori.png",
       "active": true,
       "color": "",
       "channelUrl": ""
