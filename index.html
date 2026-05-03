@@ -697,15 +697,13 @@ function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyS
 function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboarding,onDismissOnboarding,loggedIn}){
   const[search,setSearch]=useState('');
   const[branch,setBranch]=useState('all');
-  const[showInactive,setShowInactive]=useState(false);
   const branches=useMemo(()=>[...new Set(members.map(m=>m.branch))].sort(),[members]);
   const filtered=useMemo(()=>{
-    let l=members;
-    if(!showInactive) l=l.filter(m=>m.active!==false);
+    let l=members.filter(m=>m.active!==false);
     if(branch!=='all') l=l.filter(m=>m.branch===branch);
     if(search.trim()){const q=search.trim().toLowerCase();l=l.filter(m=>m.name?.toLowerCase().includes(q)||m.nameEn?.toLowerCase().includes(q));}
     return l;
-  },[members,branch,search,showInactive]);
+  },[members,branch,search]);
   const cnt=oshiIds.size;
   return(
     <div className="page-pad">
@@ -721,9 +719,6 @@ function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboa
         <input className="search-box" placeholder="🔍 搜尋名稱…" value={search} onChange={e=>setSearch(e.target.value)}/>
         <button className={`filter-btn ${branch==='all'?'active all':''}`} onClick={()=>setBranch('all')}>全部</button>
         {branches.map(b=><button key={b} className={`filter-btn ${branch===b?`active ${b}`:''}`} onClick={()=>setBranch(b)}>{bl(b)}</button>)}
-        <label className="toggle-label" style={{marginLeft:'auto'}} onClick={()=>setShowInactive(s=>!s)}>
-          <span className={`toggle-sw ${showInactive?'on':''}`}></span>顯示畢業
-        </label>
       </div>
       <div className="result-info">找到 {filtered.length} 位{cnt>0&&<span style={{color:'var(--accent1)'}}> · 已選 {cnt} 位</span>}</div>
       <div className="member-grid">
@@ -731,7 +726,7 @@ function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboa
           <div className="empty" style={{gridColumn:'1/-1'}}>
             <div className="empty-icon">🔍</div>
             <div className="empty-title">沒找到「{search||branch}」相關成員</div>
-            <div className="empty-sub">換個關鍵字、切換分部，或打開「顯示畢業」</div>
+            <div className="empty-sub">換個關鍵字或切換分部試試</div>
           </div>
         ):filtered.map(m=>(
           <div key={m.id} className={`member-card ${oshiIds.has(m.id)?'selected':''} ${m.active===false?'inactive':''}`} onClick={()=>onToggle(m.id)}>
