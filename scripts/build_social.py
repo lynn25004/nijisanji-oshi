@@ -104,6 +104,59 @@ def get_yt_channel_info(channel_id):
     return desc, custom_url
 
 
+# Fallback：爬 YouTube /about 頁的 ytInitialData，老牌 ライバー 把 X/Twitch 放在 channel header
+# link icons 裡（YouTube Data API v3 拿不到，要爬 HTML）
+def scrape_yt_about_links(channel_id, retries=2):
+    """爬 channel /about 找 ytInitialData 裡的所有 twitter/twitch handle，回傳兩個 list"""
+    last_err = ""
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(
+                f"https://www.youtube.com/channel/{channel_id}/about",
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                                  "(KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+                    "Accept-Language": "en-US,en;q=0.9",
+                    # Bypass YouTube 同意畫面，否則 EU IP / 被疑爬蟲時會跳 consent 而拿不到資料
+                    "Cookie": "CONSENT=YES+yt.453767233.en-US+FX+417; SOCS=CAESEwgDEgk0ODE3Nzk3MjQaAmVuIAEaBgiA_LyaBg",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=25) as r:
+                html = r.read().decode("utf-8", errors="replace")
+            twitters = list(dict.fromkeys(TWITTER_RE.findall(html)))
+            twitches = list(dict.fromkeys(TWITCH_RE.findall(html)))
+            if twitters or twitches or attempt == retries - 1:
+                return twitters, twitches
+            time.sleep(2)
+        except Exception as e:
+            last_err = str(e)
+            time.sleep(2)
+    print(f"  /about 爬失敗 {channel_id}: {last_err}", file=sys.stderr)
+    return [], []
+
+
+def pick_personal_handle(handles, member):
+    """從多個 handle 挑最像本人的：名字 token 出現在 handle 內優先"""
+    if not handles:
+        return None
+    name_keys = []
+    for src in (member.get("name") or "", member.get("nameEn") or ""):
+        for tok in re.split(r"[\s/／・·]+", src.lower()):
+            if len(tok) >= 3 and tok.isascii():
+                name_keys.append(tok)
+    # 排除明顯非個人帳號
+    cleaned = [h for h in handles if h.lower() not in EXCLUDE_HANDLES]
+    if not cleaned:
+        return None
+    # 優先：handle 內含 member name token
+    for h in cleaned:
+        hl = h.lower()
+        if any(k in hl for k in name_keys):
+            return h
+    # 否則第一個
+    return cleaned[0]
+
+
 # X (Twitter) 連結偵測
 TWITTER_RE = re.compile(
     r"https?://(?:www\.|mobile\.)?(?:twitter\.com|x\.com)/([A-Za-z0-9_]{1,15})(?![A-Za-z0-9_/])",
@@ -117,7 +170,8 @@ TWITCH_RE = re.compile(
 EXCLUDE_HANDLES = {
     "share", "intent", "home", "i", "messages", "notifications", "search",
     "explore", "settings", "twitterapi", "twitter", "x", "support",
-    "anijisanji", "nijisanji_app", "nijisanji_world",
+    "anijisanji", "nijisanji_app", "nijisanji_world", "nijisanji_en", "nijisanji_id",
+    "anycolor_corp", "lantis_staff", "anycolorinc",
 }
 
 
@@ -159,20 +213,36 @@ def main():
     print(f"  匹配 {matched}/{len(members)} 位")
 
     # 對每位匹配到的成員撈 YouTube channel info
-    print("用 YouTube Data API 抓 description…")
+    print("用 YouTube Data API 抓 description + 必要時爬 /about 補 X/Twitch…")
     social = {}
+    member_map = {m["id"]: m for m in members}
     for i, (mid, ch) in enumerate(member_to_channel.items(), 1):
         yt_id = ch["id"]
         yt_url = f"https://www.youtube.com/channel/{yt_id}"
-        desc, custom_url = get_yt_channel_info(yt_id)
+        desc, _ = get_yt_channel_info(yt_id)
         twitter, twitch = extract_socials(desc) if desc else (None, None)
+
+        # Fallback：description 沒抓到 → 爬 /about 頁的 ytInitialData
+        if not twitter or not twitch:
+            twi_list, twh_list = scrape_yt_about_links(yt_id)
+            if not twitter:
+                handle = pick_personal_handle(twi_list, member_map[mid])
+                if handle:
+                    twitter = f"https://x.com/{handle}"
+            if not twitch:
+                handle = pick_personal_handle(twh_list, member_map[mid])
+                if handle:
+                    twitch = f"https://twitch.tv/{handle}"
+            time.sleep(1.0)  # 爬 YouTube 慢點，避免被限速
+
         social[mid] = {
             "youtube": yt_url,
             "twitter": twitter,
             "twitch": twitch,
         }
         if i % 25 == 0:
-            print(f"  ({i}/{matched})")
+            has_x = sum(1 for v in social.values() if v["twitter"])
+            print(f"  ({i}/{matched})  目前 X 覆蓋 {has_x}")
         time.sleep(0.05)
 
     # 統計
@@ -182,6 +252,21 @@ def main():
     print(f"  YouTube: {len(social)}")
     print(f"  X (Twitter): {has_x}")
     print(f"  Twitch: {has_tw}")
+
+    # 手動 override：若 data/social_overrides.json 存在，會覆蓋自動抓取的結果
+    overrides_file = ROOT / "data" / "social_overrides.json"
+    if overrides_file.exists():
+        try:
+            ov = json.loads(overrides_file.read_text("utf-8"))
+            for mid, fields in ov.items():
+                if mid not in social:
+                    social[mid] = {"youtube": None, "twitter": None, "twitch": None}
+                for k, v in fields.items():
+                    if v:
+                        social[mid][k] = v
+            print(f"  套用手動 overrides {len(ov)} 條")
+        except Exception as e:
+            print(f"  ⚠️ overrides 讀取失敗：{e}")
 
     out = {
         "lastUpdated": datetime.now(timezone.utc).isoformat(timespec="seconds"),

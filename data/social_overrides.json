@@ -1,0 +1,10 @@
+{
+  "_comment": "手動補 X / Twitch 連結。auto-build 抓不到時這裡的會優先生效。",
+  "_format": "{ \"<member_id>\": { \"twitter\": \"https://x.com/...\", \"twitch\": \"https://twitch.tv/...\" } }",
+  "_known_missing_x": [
+    "kaede-higuchi", "tamaki-fumino", "mugi-ienaga", "ryushen", "chaika-hanabatake",
+    "kakeru-yumeoi", "eli-conifer", "sara-hoshikawa", "sango-suo", "lee-roha",
+    "meloco-kyoran", "vantacrow-bringer", "zeal-ginjoka"
+  ],
+  "kaede-higuchi": {"twitter": "https://x.com/Higuchikaede"}
+}
