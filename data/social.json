@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-05-03T03:55:53+00:00",
+  "lastUpdated": "2026-05-03T17:47:05+00:00",
   "social": {
     "mito-tsukino": {
       "youtube": "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A",
@@ -8,7 +8,7 @@
     },
     "kaede-higuchi": {
       "youtube": "https://www.youtube.com/channel/UCsg-YqdqQ-KFF0LNk23BY4A",
-      "twitter": "https://x.com/Higuchikaede",
+      "twitter": null,
       "twitch": null
     },
     "elu": {
@@ -76,6 +76,11 @@
       "twitter": "https://x.com/ushimi_ichigo",
       "twitch": null
     },
+    "kanae": {
+      "youtube": "https://www.youtube.com/channel/UCspv01oxUFf_MTSipURRhkA",
+      "twitter": null,
+      "twitch": null
+    },
     "youko-akabane": {
       "youtube": "https://www.youtube.com/channel/UCBi8YaVyZpiKWN3_Z0dCTfQ",
       "twitter": "https://x.com/Youko_Akabane",
@@ -135,6 +140,11 @@
       "youtube": "https://www.youtube.com/channel/UC0g1AE0DOjBYnLhkgoRWN1w",
       "twitter": "https://x.com/honmahimawari",
       "twitch": "https://twitch.tv/honhima"
+    },
+    "kuzuha": {
+      "youtube": "https://www.youtube.com/channel/UCSFCh5NL4qXrAy9u-u2lX3g",
+      "twitter": "https://x.com/Vamp_Kuzu",
+      "twitch": null
     },
     "yuika-shiina": {
       "youtube": "https://www.youtube.com/channel/UC_4tXjqecqox5Uc05ncxpxg",
@@ -398,7 +408,7 @@
     },
     "ibrahim": {
       "youtube": "https://www.youtube.com/channel/UCmZ1Rbthn-6Jm_qOGjYsh5A",
-      "twitter": "https://x.com/honmono_ibrahim",
+      "twitter": null,
       "twitch": null
     },
     "furen-e-lustario": {
@@ -424,6 +434,11 @@
     "tojiro-genzuki": {
       "youtube": "https://www.youtube.com/channel/UCGw7lrT-rVZCWHfdG9Frcgg",
       "twitter": "https://x.com/1O46V",
+      "twitch": null
+    },
+    "so-nagi": {
+      "youtube": "https://www.youtube.com/channel/UC5ek2GWKvUKFgnKSHuuCFrw",
+      "twitter": "https://x.com/NagiSo2434",
       "twitch": null
     },
     "kirame-sorahoshi": {
@@ -469,6 +484,11 @@
     "yang-nari": {
       "youtube": "https://www.youtube.com/channel/UCCHH0nWYXFZmtDS_4tvMxHQ",
       "twitter": "https://x.com/haruki_naria",
+      "twitch": null
+    },
+    "oh-jiyu": {
+      "youtube": "https://www.youtube.com/channel/UCnzZmBOSrQf2wDBbnsDajVw",
+      "twitter": "https://x.com/JiyuOh2434",
       "twitch": null
     },
     "ryu-hari": {
@@ -525,6 +545,11 @@
       "youtube": "https://www.youtube.com/channel/UCqjTqdVlvIipZXIKeCkHKUA",
       "twitter": "https://x.com/oliverD_23",
       "twitch": null
+    },
+    "ha-yun": {
+      "youtube": "https://www.youtube.com/channel/UCrhhJPNsOqzNIkUfTABoSpg",
+      "twitter": "https://x.com/HaYun2434",
+      "twitch": "https://twitch.tv/hayun2434"
     },
     "na-sera": {
       "youtube": "https://www.youtube.com/channel/UCX88Pe54pxbJDSGIyGrzNdg",
@@ -688,7 +713,7 @@
     },
     "ittetsu-saiki": {
       "youtube": "https://www.youtube.com/channel/UCy8P3o5XlMpJGQY4WugzdNA",
-      "twitter": "https://x.com/Saiki_Supadari",
+      "twitter": null,
       "twitch": null
     },
     "rito-usami": {
@@ -723,8 +748,13 @@
     },
     "vantacrow-bringer": {
       "youtube": "https://www.youtube.com/channel/UCpYf6C9QsP_BRf97vLuXlIA",
-      "twitter": null,
+      "twitter": "https://x.com/SaJi_VT",
       "twitch": null
+    },
+    "yu-q-wilson": {
+      "youtube": "https://www.youtube.com/channel/UCKpKC3M5fkcEvtOr06dmYlA",
+      "twitter": "https://x.com/YuQWilson",
+      "twitch": "https://twitch.tv/yu_q_wilson"
     },
     "vezalius-bandage": {
       "youtube": "https://www.youtube.com/channel/UCK9l6rTwU3hiSZijIMq51Gw",
@@ -831,9 +861,19 @@
       "twitter": "https://x.com/KaelixDebonair",
       "twitch": null
     },
+    "freodore": {
+      "youtube": "https://www.youtube.com/channel/UCr40BzcLiGruKe7M5gXR9zQ",
+      "twitter": "https://x.com/syokumura",
+      "twitch": null
+    },
     "zeal-ginjoka": {
       "youtube": "https://www.youtube.com/channel/UClMYGvekJOb51eBOCK-d4Dw",
       "twitter": null,
+      "twitch": null
+    },
+    "seible": {
+      "youtube": "https://www.youtube.com/channel/UCCugV2RWXqJMjVVQl_Yh4TQ",
+      "twitter": "https://x.com/Luki_RxR",
       "twitch": null
     },
     "ayato-hitotsubashi": {
@@ -935,6 +975,11 @@
       "youtube": "https://www.youtube.com/channel/UCzcuYIyP-1YcXC96t9J5yWQ",
       "twitter": "https://x.com/Eita_2434",
       "twitch": "https://twitch.tv/eita_2434"
+    },
+    "_comment": {
+      "youtube": null,
+      "twitter": null,
+      "twitch": null
     }
   }
 }

@@ -90,18 +90,20 @@ def fetch_holodex_streams():
 def match_member_to_channel(channel, members):
     """回傳 list of member_id 對應到這個 channel"""
     cname = (channel.get("name") or "").lower()
-    cen = (channel.get("english_name") or "").lower()
+    cen = (channel.get("english_name") or "").lower().strip()
     matched = []
     for m in members:
         n = (m.get("name") or "").lower()
-        ne = (m.get("nameEn") or "").lower()
-        # 比對 JP 名（cname 含 JP 名）
+        ne = (m.get("nameEn") or "").lower().strip()
         if n and (n in cname or n in cen):
             matched.append(m["id"])
             continue
-        # 比對 EN 名（兩段 token 都要在 channel name 裡）
         if ne:
             tokens = [t for t in re.split(r"\s+", ne) if len(t) >= 3]
+            # 單字名（Kuzuha 等）：要求 english_name 完全相符
+            if len(tokens) == 1 and ne == cen:
+                matched.append(m["id"])
+                continue
             if len(tokens) >= 2 and all(t in cen or t in cname for t in tokens):
                 matched.append(m["id"])
     return matched

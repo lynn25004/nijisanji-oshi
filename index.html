@@ -354,12 +354,14 @@ async function loadStreams(){
 function matchChannel(channel, member){
   if(!channel||!member) return false;
   const cname=(channel.name||'').toLowerCase();
-  const cen=(channel.english_name||'').toLowerCase();
+  const cen=(channel.english_name||'').toLowerCase().trim();
   const n=(member.name||'').toLowerCase();
-  const ne=(member.nameEn||'').toLowerCase();
+  const ne=(member.nameEn||'').toLowerCase().trim();
   if(n&&(cname.includes(n)||cen.includes(n))) return true;
   if(ne){
     const tokens=ne.split(/\s+/).filter(t=>t.length>=3);
+    // 單字名（Kuzuha 等）：要求 english_name 完全相符
+    if(tokens.length===1&&ne===cen) return true;
     if(tokens.length>=2&&tokens.every(t=>cen.includes(t)||cname.includes(t))) return true;
   }
   return false;
@@ -551,7 +553,7 @@ function MerchPage({member}){
       <div className="store-links">
         <a className="store-link-btn shop" href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer">🛒 商店搜尋</a>
         {(social?.youtube||member.channelUrl)&&
-          <a className="store-link-btn yt" href={social?.youtube||member.channelUrl} target="_blank" rel="noreferrer">▶️ YouTube</a>}
+          <a className="store-link-btn yt" href={social?.youtube||member.channelUrl} target="_blank" rel="noreferrer"><span style={{color:'#ff0000',fontSize:14}}>▶</span> YouTube</a>}
         {social?.twitter&&
           <a className="store-link-btn x" href={social.twitter} target="_blank" rel="noreferrer">𝕏 Twitter</a>}
         {social?.twitch&&

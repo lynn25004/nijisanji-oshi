@@ -72,13 +72,16 @@ def get_all_nijisanji_channels():
 
 def match_channel_to_member(channel, member):
     cname = (channel.get("name") or "").lower()
-    cen = (channel.get("english_name") or "").lower()
+    cen = (channel.get("english_name") or "").lower().strip()
     n = (member.get("name") or "").lower()
-    ne = (member.get("nameEn") or "").lower()
+    ne = (member.get("nameEn") or "").lower().strip()
     if n and (n in cname or n in cen):
         return True
     if ne:
         tokens = [t for t in re.split(r"\s+", ne) if len(t) >= 3]
+        # 單字名（Kuzuha, Kanae, Elu 等）：要求 english_name 完全相符避免誤配
+        if len(tokens) == 1 and ne == cen:
+            return True
         if len(tokens) >= 2 and all(t in cen or t in cname for t in tokens):
             return True
     return False
@@ -258,13 +261,18 @@ def main():
     if overrides_file.exists():
         try:
             ov = json.loads(overrides_file.read_text("utf-8"))
+            applied = 0
             for mid, fields in ov.items():
+                # 跳過 _comment / _format / _known_missing_x 等說明欄位
+                if mid.startswith("_") or not isinstance(fields, dict):
+                    continue
                 if mid not in social:
                     social[mid] = {"youtube": None, "twitter": None, "twitch": None}
                 for k, v in fields.items():
                     if v:
                         social[mid][k] = v
-            print(f"  套用手動 overrides {len(ov)} 條")
+                applied += 1
+            print(f"  套用手動 overrides {applied} 條")
         except Exception as e:
             print(f"  ⚠️ overrides 讀取失敗：{e}")
 
