@@ -963,17 +963,33 @@ function LoginModal({onClose}){
   const[sending,setSending]=useState(false);
   const[sent,setSent]=useState(false);
   const[err,setErr]=useState('');
+  const[code,setCode]=useState('');
+  const[verifying,setVerifying]=useState(false);
   const[showPrivacy,setShowPrivacy]=useState(false);
   const submit=async()=>{
     if(!email.trim()) return;
     setSending(true);setErr('');
+    // 不設 emailRedirectTo → Supabase 改寄 6 位數驗證碼（解 iPhone PWA 跟 Safari 分開儲存的問題）
+    // 桌面用戶若有 magic link 也能點，桌面 Safari ≠ PWA 的問題不存在
     const{error}=await sb.auth.signInWithOtp({
       email:email.trim(),
-      options:{emailRedirectTo:location.origin+location.pathname}
+      options:{shouldCreateUser:true}
     });
     setSending(false);
     if(error) setErr('寄送失敗：'+error.message);
     else setSent(true);
+  };
+  const verifyCode=async()=>{
+    if(!code.trim()) return;
+    setVerifying(true);setErr('');
+    const{error}=await sb.auth.verifyOtp({
+      email:email.trim(),
+      token:code.trim().replace(/\s/g,''),
+      type:'email',
+    });
+    setVerifying(false);
+    if(error) setErr('驗證失敗：'+error.message+'（碼可能過期或輸錯）');
+    else onClose();  // 登入成功 onAuthStateChange 會處理
   };
   return(
     <div className="modal-bd" onClick={e=>{if(e.target===e.currentTarget) onClose();}}>
@@ -1011,18 +1027,32 @@ function LoginModal({onClose}){
           </>
         ):(
           <>
-            <div style={{textAlign:'center',padding:'8px 0 16px'}}>
-              <div style={{fontSize:54,marginBottom:10}}>📬</div>
-              <h2 style={{marginBottom:8}}>登入連結已寄出！</h2>
-              <p style={{textAlign:'center',marginBottom:0}}>
-                我們已寄信到<br/>
-                <b style={{color:'var(--text)'}}>{email}</b><br/><br/>
-                請去信箱點「Magic Link」連結即可登入。<br/>
-                <span style={{color:'var(--text3)',fontSize:11}}>連結 5 分鐘內有效 · 沒收到請看垃圾信匣</span>
+            <div style={{textAlign:'center',padding:'4px 0 14px'}}>
+              <div style={{fontSize:48,marginBottom:8}}>📬</div>
+              <h2 style={{marginBottom:6}}>驗證碼已寄出</h2>
+              <p style={{textAlign:'center',marginBottom:14,fontSize:13}}>
+                信箱：<b style={{color:'var(--text)'}}>{email}</b><br/>
+                <span style={{color:'var(--text3)',fontSize:11}}>請輸入信件中的 6 位數驗證碼（5 分鐘內有效，沒收到請看垃圾信匣）</span>
               </p>
             </div>
-            <div className="modal-actions" style={{justifyContent:'center'}}>
-              <button className="modal-submit" onClick={onClose}>關閉</button>
+            <input
+              type="text" inputMode="numeric" pattern="[0-9]*"
+              placeholder="6 位數驗證碼"
+              value={code}
+              onChange={e=>setCode(e.target.value)}
+              onKeyDown={e=>{if(e.key==='Enter') verifyCode();}}
+              autoFocus
+              style={{textAlign:'center',fontSize:22,letterSpacing:6,fontFamily:'monospace'}}
+            />
+            <div className="modal-actions">
+              <button className="modal-cancel" onClick={onClose}>取消</button>
+              <button className="modal-submit" onClick={verifyCode} disabled={verifying||code.replace(/\s/g,'').length<6}>
+                {verifying?'驗證中…':'登入'}
+              </button>
+            </div>
+            {err&&<div className="modal-msg err">{err}</div>}
+            <div style={{fontSize:11,color:'var(--text3)',marginTop:10,textAlign:'center'}}>
+              <a href="#" onClick={e=>{e.preventDefault();setSent(false);setCode('');setErr('');}} style={{color:'var(--text2)'}}>重新寄送驗證碼</a>
             </div>
           </>
         )}
