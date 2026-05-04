@@ -230,8 +230,18 @@ def main():
 
     print("\n[1/3] 抓 sitemap…")
     pairs = list_sitemap_codes()
-    print(f"  共 {len(pairs)} 個商品 URL")
+    print(f"  sitemap 共 {len(pairs)} 個商品")
     lastmod_map = {c: lm for c, lm in pairs}
+
+    # shop sitemap 對新品有 lag（可能落後幾天），先抓 search index 補漏
+    print("  ↳ 同時抓官方搜尋 index 補 sitemap 漏的新品…")
+    rank_map = fetch_official_order()
+    print(f"  search index 共 {len(rank_map)} 個商品")
+    extra_codes = set(rank_map.keys()) - set(lastmod_map.keys())
+    print(f"  sitemap 漏抓的新品：{len(extra_codes)} 筆")
+    for c in extra_codes:
+        pairs.append((c, ""))
+        lastmod_map[c] = ""
 
     existing = {}
     if PRODUCTS_FILE.exists():
@@ -244,7 +254,6 @@ def main():
             existing = {}
 
     valid_codes = set(lastmod_map.keys())
-    # 需重抓：新出現的 + 既有但缺 available 欄位的（首次補抓）
     todo = []
     for c, lm in pairs:
         e = existing.get(c)
@@ -288,10 +297,8 @@ def main():
             if not p.get("firstSeenAt"):
                 p["firstSeenAt"] = p.get("lastmod") or now_iso
             merged.append(p)
-    # 抓官方「掲載開始日(新しい順)」全站排序
-    print(f"\n[2.5/3] 抓官方掲載開始日順序…")
-    rank_map = fetch_official_order()
-    print(f"  取得 {len(rank_map)} 筆官方排序")
+    # 套用官方排序（rank_map 在 [1/3] 已經抓過）
+    print(f"\n[2.5/3] 套用官方掲載開始日順序…")
     for p in merged:
         rank = rank_map.get(p["code"])
         if rank is not None:
