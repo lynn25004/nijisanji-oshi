@@ -263,6 +263,11 @@
     .stream-title{font-size:13px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:4px}
     .stream-meta{font-size:11px;color:var(--text2);line-height:1.5}
     .stream-channel{font-size:10px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .merch-controls{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 10px;align-items:center}
+    .merch-sort{background:var(--card-bg);border:1px solid var(--card-border);color:var(--text);padding:6px 12px;border-radius:18px;font-size:12px;cursor:pointer;font-family:inherit;outline:none;transition:border-color .2s}
+    .merch-sort:hover{border-color:var(--accent2)}
+    .merch-clear{background:transparent;border:none;color:var(--text2);cursor:pointer;font-size:11px;padding:4px 8px}
+    .merch-clear:hover{color:var(--accent1)}
     .cal-btn{display:flex;align-items:center;justify-content:center;width:44px;background:var(--bg);border-left:1px solid var(--card-border);text-decoration:none;font-size:18px;flex-shrink:0;transition:all .2s}
     .cal-btn:hover{background:var(--accent2);transform:scale(1.05)}
     .stream-meta .badge{display:inline-block;background:var(--bg3);padding:1px 7px;border-radius:8px;margin-right:5px;font-size:10px}
@@ -365,6 +370,17 @@ async function loadStreams(){
     _streamsCache=await r.json();
     return _streamsCache;
   }catch{return null;}
+}
+
+// 過濾『假 live』：已結束 / 太久沒更新 / 已有 duration
+function isActuallyLive(s){
+  if(s.end_actual) return false;
+  if(s.duration && s.duration>0) return false;
+  if(s.start_actual){
+    const t=new Date(s.start_actual).getTime();
+    if(Date.now()-t>12*60*60*1000) return false;
+  }
+  return true;
 }
 
 // 比對成員 ↔ Holodex channel（跟後端 notify_streams.py 同邏輯）
@@ -498,7 +514,7 @@ function StreamsForMember({member}){
 
   const filtered=useMemo(()=>{
     if(!streams) return null;
-    const live=(streams.live||[]).filter(s=>matchChannel(s.channel,member));
+    const live=(streams.live||[]).filter(s=>matchChannel(s.channel,member)).filter(isActuallyLive);
     const upcoming=(streams.upcoming||[]).filter(s=>matchChannel(s.channel,member));
     const past=(streams.past||[]).filter(s=>matchChannel(s.channel,member)).slice(0,5);
     return {live,upcoming,past,lastUpdated:streams.lastUpdated};
@@ -546,6 +562,8 @@ function MerchPage({member}){
   const[data,setData]=useState(null);
   const[err,setErr]=useState('');
   const[social,setSocial]=useState(null);
+  const[sortBy,setSortBy]=useState('official');  // official / newest / oldest / price-asc / price-desc
+  const[unitFilter,setUnitFilter]=useState('');  // unit (categry) 篩選
 
   useEffect(()=>{
     setErr('');
@@ -553,21 +571,49 @@ function MerchPage({member}){
     loadSocial().then(s=>setSocial(s?.social?.[member.id]||null));
   },[member.id]);
 
-  const matched=useMemo(()=>{
+  const matchedAll=useMemo(()=>{
     if(!data||!member.name) return[];
-    // 用 talents 陣列精準比對 + 過濾已下架 + 依 lastmod 由新到舊
-    const ms=data.products.filter(p=>
+    return data.products.filter(p=>
       (p.talents||[]).includes(member.name) && p.available!==false
     );
-    // 排序：優先用官方「掲載開始日(新しい順)」rank，沒有則退回 firstSeenAt 新→舊
-    const BIG=1e9;
-    return ms.sort((a,b)=>{
-      const ra=Number.isFinite(a.officialOrder)?a.officialOrder:BIG;
-      const rb=Number.isFinite(b.officialOrder)?b.officialOrder:BIG;
-      if(ra!==rb) return ra-rb;
-      return (b.firstSeenAt||b.lastmod||'').localeCompare(a.firstSeenAt||a.lastmod||'');
-    });
   },[data,member]);
+
+  // 收集這位成員所有出現過的 unit（按出現次數排），給篩選下拉
+  const unitOptions=useMemo(()=>{
+    const counts={};
+    matchedAll.forEach(p=>(p.units||[]).forEach(u=>{counts[u]=(counts[u]||0)+1;}));
+    // 過濾掉太通用的（出現在每樣商品的 unit）+ 出現次數太少的
+    const total=matchedAll.length;
+    return Object.entries(counts)
+      .filter(([u,c])=>c<total*0.9 && c>=2)  // 不要那些幾乎每件都有 / 只 1 件
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,12)
+      .map(([u,c])=>({u,c}));
+  },[matchedAll]);
+
+  const matched=useMemo(()=>{
+    let l=matchedAll;
+    if(unitFilter) l=l.filter(p=>(p.units||[]).includes(unitFilter));
+    const BIG=1e9;
+    const sorted=[...l];
+    if(sortBy==='newest'){
+      sorted.sort((a,b)=>(b.firstSeenAt||b.lastmod||'').localeCompare(a.firstSeenAt||a.lastmod||''));
+    }else if(sortBy==='oldest'){
+      sorted.sort((a,b)=>(a.firstSeenAt||a.lastmod||'').localeCompare(b.firstSeenAt||b.lastmod||''));
+    }else if(sortBy==='price-asc'){
+      sorted.sort((a,b)=>(a.price??1e9)-(b.price??1e9));
+    }else if(sortBy==='price-desc'){
+      sorted.sort((a,b)=>(b.price??-1)-(a.price??-1));
+    }else{  // official 預設
+      sorted.sort((a,b)=>{
+        const ra=Number.isFinite(a.officialOrder)?a.officialOrder:BIG;
+        const rb=Number.isFinite(b.officialOrder)?b.officialOrder:BIG;
+        if(ra!==rb) return ra-rb;
+        return (b.firstSeenAt||b.lastmod||'').localeCompare(a.firstSeenAt||a.lastmod||'');
+      });
+    }
+    return sorted;
+  },[matchedAll,sortBy,unitFilter]);
 
   const c=member.color||hc(member.id||'x');
   const searchQ=encodeURIComponent(member.name||member.nameEn||'');
@@ -618,6 +664,27 @@ function MerchPage({member}){
         {data&&<span style={{fontSize:11,color:'var(--text2)',marginLeft:'auto'}}>索引更新：{data.lastUpdated}</span>}
       </div>
 
+      {data&&matchedAll.length>0&&(
+        <div className="merch-controls">
+          <select className="merch-sort" value={sortBy} onChange={e=>setSortBy(e.target.value)}>
+            <option value="official">📌 官方推薦</option>
+            <option value="newest">🆕 最新上架</option>
+            <option value="oldest">📦 最早上架</option>
+            <option value="price-asc">💴 價格 低→高</option>
+            <option value="price-desc">💴 價格 高→低</option>
+          </select>
+          {unitOptions.length>0&&(
+            <select className="merch-sort" value={unitFilter} onChange={e=>setUnitFilter(e.target.value)}>
+              <option value="">📁 全部分類</option>
+              {unitOptions.map(({u,c})=><option key={u} value={u}>{u} ({c})</option>)}
+            </select>
+          )}
+          {(sortBy!=='official'||unitFilter)&&(
+            <button className="merch-clear" onClick={()=>{setSortBy('official');setUnitFilter('');}}>✕ 重設</button>
+          )}
+        </div>
+      )}
+
       {!data&&!err&&(
         <div className="merch-loading">
           <div className="spinner"></div>
@@ -658,6 +725,7 @@ function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyS
     <div className="oshi-page">
       <div className="page-title">💜 {isShared?'朋友的推し':'我的推し'}</div>
       <div className="page-sub">共 {list.length} 位 · 點擊成員查看周邊商品</div>
+      {!isShared&&list.length>0&&<LiveNowWidget members={members} oshiIds={oshiIds}/>}
       {isShared&&(
         <div style={{textAlign:'center',margin:'8px 0 14px'}}>
           <button onClick={onApplyShared} style={{background:'var(--accent)',border:'none',color:'#fff',padding:'8px 18px',borderRadius:20,cursor:'pointer',fontSize:13,marginRight:8}}>
@@ -783,10 +851,11 @@ function LiveNowWidget({members,oshiIds}){
     if(!streams) return null;
     const oshiMembers=members.filter(m=>oshiIds.has(m.id));
     const filterByOshi=arr=>{
-      if(!oshiMembers.length) return arr;  // 沒選推し → 顯示全部彩虹社的
+      if(!oshiMembers.length) return arr;
       return arr.filter(s=>oshiMembers.some(m=>matchChannel(s.channel,m)));
     };
-    const live=filterByOshi(streams.live||[]);
+    // 過濾『假 live』：已結束 / 太久沒更新
+    const live=filterByOshi((streams.live||[]).filter(isActuallyLive));
     const now=Date.now();
     const upcoming=filterByOshi((streams.upcoming||[]).filter(s=>{
       const t=new Date(s.start_scheduled).getTime();
@@ -831,8 +900,7 @@ function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboa
   const cnt=oshiIds.size;
   return(
     <div className="page-pad">
-      {showOnboarding&&<Onboarding onDismiss={onDismissOnboarding} loggedIn={loggedIn}/>}
-      <LiveNowWidget members={members} oshiIds={oshiIds}/>
+      {showOnboarding&&<Onboarding onDismiss={onDismissOnboarding} loggedIn={loggedIn} members={members} oshiIds={oshiIds} onToggle={onToggle}/>}
       <div style={{marginBottom:14,marginTop:2}}>
         <div className="page-title">選擇你的推し 💜</div>
         <div className="page-sub">
@@ -1014,20 +1082,81 @@ function ThemeToggle(){
 }
 
 // ─── Onboarding banner（首次訪客顯示） ───
-function Onboarding({onDismiss,loggedIn}){
+function Onboarding({onDismiss,loggedIn,members,oshiIds,onToggle}){
+  const[popular,setPopular]=useState(null);
+  useEffect(()=>{
+    sb.from('oshi_popular_v').select('member_id,cnt').limit(50).then(({data})=>{
+      setPopular(data||[]);
+    });
+  },[]);
+
+  const memberMap=useMemo(()=>{
+    const m={};
+    members.forEach(x=>{m[x.id]=x;});
+    return m;
+  },[members]);
+
+  // 熱門：訂閱數 ≥ 1，依數量排，取前 8
+  const hot=useMemo(()=>{
+    if(!popular) return [];
+    return popular
+      .filter(p=>memberMap[p.member_id]&&memberMap[p.member_id].active!==false)
+      .slice(0,8)
+      .map(p=>memberMap[p.member_id]);
+  },[popular,memberMap]);
+
+  // 最近出道（取活躍且 debut 最新 8 位）
+  const recent=useMemo(()=>{
+    return members
+      .filter(m=>m.active!==false&&m.debutDate)
+      .sort((a,b)=>(a.debutDate<b.debutDate?1:-1))
+      .slice(0,8);
+  },[members]);
+
   return(
     <div className="onboarding">
-      <span className="onboarding-icon">🌈</span>
-      <div className="onboarding-body">
-        <div className="onboarding-title">歡迎來到推し選擇器！</div>
-        <div>
-          1️⃣ 點頭像選你推的彩虹社成員<br/>
-          2️⃣ 進「我的推し」看周邊商品<br/>
-          3️⃣ {loggedIn?'開啟通知':'登入後開啟通知'}，新品 / 直播都會主動提醒
+      <button className="onboarding-close" onClick={onDismiss} title="不再顯示">×</button>
+      <div style={{display:'flex',alignItems:'flex-start',gap:12,marginBottom:12}}>
+        <span className="onboarding-icon">🌈</span>
+        <div className="onboarding-body">
+          <div className="onboarding-title">歡迎來到推し選擇器！</div>
+          <div>
+            點頭像選推し → 進「💜 我的推し」看商品 + {loggedIn?'開啟':'登入'}通知（新品 / 直播）
+          </div>
         </div>
       </div>
-      <button className="onboarding-close" onClick={onDismiss} title="不再顯示">×</button>
+      {hot.length>0&&(
+        <div style={{marginTop:10}}>
+          <div style={{fontSize:11,color:'var(--text2)',marginBottom:6}}>🔥 大家都推</div>
+          <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4}}>
+            {hot.map(m=><QuickPick key={m.id} member={m} selected={oshiIds.has(m.id)} onClick={()=>onToggle(m.id)}/>)}
+          </div>
+        </div>
+      )}
+      {recent.length>0&&(
+        <div style={{marginTop:10}}>
+          <div style={{fontSize:11,color:'var(--text2)',marginBottom:6}}>🆕 最近出道</div>
+          <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4}}>
+            {recent.map(m=><QuickPick key={m.id} member={m} selected={oshiIds.has(m.id)} onClick={()=>onToggle(m.id)}/>)}
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function QuickPick({member,selected,onClick}){
+  return(
+    <button onClick={onClick} title={member.name} style={{
+      background:'transparent',border:'none',padding:0,cursor:'pointer',
+      flexShrink:0,position:'relative',transition:'transform .15s',
+      transform:selected?'scale(1.05)':'scale(1)',
+    }}>
+      <div style={{width:48,height:48,borderRadius:'50%',overflow:'hidden',border:`2px solid ${selected?'var(--accent1)':'var(--card-border)'}`,boxShadow:selected?'0 0 0 2px rgba(255,107,157,.25)':'none'}}>
+        <Avatar member={member} size={44}/>
+      </div>
+      {selected&&<span style={{position:'absolute',top:-2,right:-2,background:'var(--accent1)',color:'#fff',width:16,height:16,borderRadius:'50%',fontSize:10,display:'flex',alignItems:'center',justifyContent:'center'}}>♥</span>}
+    </button>
   );
 }
 

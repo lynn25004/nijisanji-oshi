@@ -54,6 +54,27 @@ def slim(item):
     }
 
 
+def is_actually_live(item):
+    """過濾掉 Holodex 還沒更新的『假 live』：
+    1. 已有 end_actual → 結束了
+    2. start_actual 超過 12 小時 → 99% 已結束（最長 vtuber 直播很少超過）
+    3. duration > 0 → Holodex 已標記結束時間"""
+    from datetime import datetime, timezone, timedelta
+    if item.get("end_actual"):
+        return False
+    if item.get("duration"):
+        return False
+    sa = item.get("start_actual")
+    if sa:
+        try:
+            t = datetime.fromisoformat(sa.replace("Z", "+00:00"))
+            if datetime.now(timezone.utc) - t > timedelta(hours=12):
+                return False
+        except Exception:
+            pass
+    return True
+
+
 def main():
     print("從 Holodex 抓資料…")
 
@@ -78,15 +99,21 @@ def main():
     seen = set()
     live = []
     upcoming = []
+    moved_to_past = 0
     for it in live_up:
         if it["id"] in seen:
             continue
         seen.add(it["id"])
         st = it.get("status")
         if st == "live":
-            live.append(slim(it))
+            if is_actually_live(it):
+                live.append(slim(it))
+            else:
+                moved_to_past += 1  # Holodex 還沒更新，我們判斷是結束了
         elif st == "upcoming":
             upcoming.append(slim(it))
+    if moved_to_past:
+        print(f"  過濾 {moved_to_past} 場『假 live』（已結束但 Holodex 還沒更新）")
 
     past_list = []
     for it in past:
