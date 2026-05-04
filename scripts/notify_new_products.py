@@ -201,17 +201,23 @@ def send_email(to_email, products, member_id_to_name):
         <a href="{SITE_URL}" style="display:inline-block;background:linear-gradient(135deg,#ff6b9d,#c77dff);color:#fff;padding:10px 24px;border-radius:20px;text-decoration:none;font-size:13px">看完整推し清單</a>
       </div>
       <div style="margin-top:24px;padding-top:16px;border-top:1px solid #2e2e48;font-size:11px;color:#666">
-        不想再收？到 <a href="{SITE_URL}" style="color:#9999bb">推し選擇器</a> 關閉通知開關。
+        <a href="{SITE_URL}?goto=oshi" style="color:#9999bb">⚙️ 改通知設定</a> ・
+        <a href="{SITE_URL}?goto=oshi" style="color:#9999bb">🚪 停止接收</a>
       </div>
     </div>
   </div>
 </body></html>"""
 
+    unsub_url = f"{SITE_URL}?goto=oshi"
     payload = {
         "from": FROM_EMAIL,
         "to": [to_email],
         "subject": subject,
         "html": html,
+        "headers": {
+            "List-Unsubscribe": f"<{unsub_url}>",
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
     }
     req = urllib.request.Request(
         "https://api.resend.com/emails",

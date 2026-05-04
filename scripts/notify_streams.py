@@ -131,11 +131,17 @@ def get_user_email(user_id):
 
 # ========== Resend Email ==========
 def send_email(to_email, subject, html):
+    unsub_url = f"{SITE_URL}?goto=oshi"
     payload = {
         "from": FROM_EMAIL,
         "to": [to_email],
         "subject": subject,
         "html": html,
+        "headers": {
+            # Gmail/Outlook 會自動顯示「退訂」按鈕
+            "List-Unsubscribe": f"<{unsub_url}>",
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
     }
     req = urllib.request.Request(
         "https://api.resend.com/emails",
@@ -365,7 +371,9 @@ def render_email_html(stream_hits, member_by_id):
       <div style="color:#9999bb;font-size:13px;margin-bottom:16px">{len(stream_hits)} 場直播即將開始或正在進行</div>
       <table style="width:100%;border-collapse:collapse">{rows_html}</table>
       <div style="margin-top:24px;padding-top:16px;border-top:1px solid #2e2e48;font-size:11px;color:#666">
-        到 <a href="{SITE_URL}" style="color:#9999bb">推し選擇器</a> 改通知設定
+        <a href="{SITE_URL}?goto=oshi" style="color:#9999bb">⚙️ 改通知設定</a> ・
+        <a href="{SITE_URL}?goto=oshi" style="color:#9999bb">🚪 停止接收</a><br/>
+        如有疑問，請聯絡網站管理員
       </div>
     </div>
   </div>

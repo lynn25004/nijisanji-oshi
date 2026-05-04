@@ -731,7 +731,46 @@ function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyS
           ＋ 繼續選擇成員
         </button>
       </div>}
+      {loggedIn&&!isShared&&(
+        <div style={{textAlign:'center',marginTop:32,paddingTop:16,borderTop:'1px solid var(--card-border)'}}>
+          <DeleteAccountBtn/>
+        </div>
+      )}
     </div>
+  );
+}
+
+function DeleteAccountBtn(){
+  const toast=useToast();
+  const handle=async()=>{
+    if(!confirm('確定要刪除帳號嗎？\n\n這會清空：\n• 你的推し清單\n• 通知訂閱設定\n• 推播訂閱\n• 寄信紀錄\n\n刪除後無法復原。')) return;
+    try{
+      const{data:{session}}=await sb.auth.getSession();
+      if(!session) return;
+      const uid=session.user.id;
+      // RLS 會自動 cascade 删除以下表的本人資料
+      await Promise.all([
+        sb.from('oshi_subscriptions').delete().eq('user_id',uid),
+        sb.from('oshi_notify_settings').delete().eq('user_id',uid),
+        sb.from('oshi_push_subscriptions').delete().eq('user_id',uid),
+        sb.from('oshi_notify_log').delete().eq('user_id',uid),
+        sb.from('oshi_stream_notify_log').delete().eq('user_id',uid),
+      ]);
+      // 取消瀏覽器推播
+      await unsubscribePush();
+      // 清本機
+      try{localStorage.removeItem('niji_oshi');}catch{}
+      await sb.auth.signOut();
+      toast('帳號資料已清除','ok',4000);
+      setTimeout(()=>location.reload(),1500);
+    }catch(e){
+      toast('刪除失敗：'+(e.message||e),'err',4000);
+    }
+  };
+  return(
+    <button onClick={handle} style={{background:'transparent',border:'1px solid #ff6b6b',color:'#ff6b6b',padding:'6px 14px',borderRadius:16,cursor:'pointer',fontSize:11}}>
+      🗑️ 刪除我的帳號
+    </button>
   );
 }
 
@@ -835,6 +874,7 @@ function LoginModal({onClose}){
   const[sending,setSending]=useState(false);
   const[sent,setSent]=useState(false);
   const[err,setErr]=useState('');
+  const[showPrivacy,setShowPrivacy]=useState(false);
   const submit=async()=>{
     if(!email.trim()) return;
     setSending(true);setErr('');
@@ -863,6 +903,22 @@ function LoginModal({onClose}){
               </button>
             </div>
             {err&&<div className="modal-msg err">{err}</div>}
+            <div style={{fontSize:11,color:'var(--text2)',marginTop:14,paddingTop:12,borderTop:'1px solid var(--card-border)',lineHeight:1.6}}>
+              {showPrivacy?(
+                <>
+                  <b style={{color:'var(--text)'}}>📋 資料用途</b><br/>
+                  • Email 只用於：登入、發送你訂閱的通知<br/>
+                  • 推し清單只有你自己看得到（RLS 鎖死）<br/>
+                  • 不會分享、不會做廣告、不會賣<br/>
+                  • 隨時到「我的推し」頁底點「刪除帳號」即可清空所有資料<br/>
+                  <a href="#" onClick={e=>{e.preventDefault();setShowPrivacy(false);}} style={{color:'var(--accent2)'}}>收起</a>
+                </>
+              ):(
+                <>
+                  登入即同意 <a href="#" onClick={e=>{e.preventDefault();setShowPrivacy(true);}} style={{color:'var(--accent2)'}}>資料用途說明</a>（30 秒讀完）
+                </>
+              )}
+            </div>
           </>
         ):(
           <>
@@ -1010,12 +1066,15 @@ function App(){
     try{localStorage.setItem('niji_onboarding_dismissed','1');}catch{}
   },[]);
   const syncedRef=useRef(false);
-  // 解析分享連結 ?oshi=id1,id2,id3
+  // 解析分享連結 ?oshi=id1,id2,id3 / ?goto=oshi (從通知信來)
   const sharedIds=(()=>{
     try{
       const v=new URLSearchParams(location.search).get('oshi');
       return v?v.split(',').map(s=>s.trim()).filter(Boolean):null;
     }catch{return null;}
+  })();
+  const gotoView=(()=>{
+    try{return new URLSearchParams(location.search).get('goto');}catch{return null;}
   })();
   const[isShared,setIsShared]=useState(()=>!!sharedIds);
   const[oshiIds,setOshiIds]=useState(()=>{
@@ -1023,8 +1082,9 @@ function App(){
     try{return new Set(JSON.parse(localStorage.getItem('niji_oshi')||'[]'));}
     catch{return new Set();}
   });
-  // 已選過推し（自己 or 從分享連結）→ 直接落地我的推し；沒有 → 從成員清單開始
-  const[view,setView]=useState(()=>oshiIds.size>0?'oshi':'select');
+  // ?goto=oshi 從通知信來 → 直接到「我的推し」（即使沒推し也跳，方便關通知）
+  // 否則：有推し → 我的推し；沒推し → 成員列表
+  const[view,setView]=useState(()=>gotoView==='oshi'?'oshi':(oshiIds.size>0?'oshi':'select'));
   const applySharedToSelf=useCallback(()=>{
     setIsShared(false);
     history.replaceState(null,'',location.pathname);
