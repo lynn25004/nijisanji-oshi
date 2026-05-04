@@ -264,6 +264,15 @@
     .stream-meta{font-size:11px;color:var(--text2);line-height:1.5}
     .stream-channel{font-size:10px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .merch-controls{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 10px;align-items:center}
+    .explore-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;margin-bottom:14px;overflow:hidden}
+    .explore-hdr{width:100%;background:transparent;border:none;color:var(--text);padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;font-family:inherit;text-align:left}
+    .explore-hdr:hover{background:var(--card-hover)}
+    .explore-body{padding:0 14px 12px}
+    .explore-row{margin-top:8px}
+    .explore-label{font-size:11px;color:var(--text2);margin-bottom:6px}
+    .explore-pics{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+    .explore-pics::-webkit-scrollbar{height:4px}
+    .explore-pics::-webkit-scrollbar-thumb{background:var(--card-border);border-radius:2px}
     .merch-sort{background:var(--card-bg);border:1px solid var(--card-border);color:var(--text);padding:6px 12px;border-radius:18px;font-size:12px;cursor:pointer;font-family:inherit;outline:none;transition:border-color .2s}
     .merch-sort:hover{border-color:var(--accent2)}
     .merch-clear{background:transparent;border:none;color:var(--text2);cursor:pointer;font-size:11px;padding:4px 8px}
@@ -597,9 +606,20 @@ function MerchPage({member}){
     const BIG=1e9;
     const sorted=[...l];
     if(sortBy==='newest'){
-      sorted.sort((a,b)=>(b.firstSeenAt||b.lastmod||'').localeCompare(a.firstSeenAt||a.lastmod||''));
+      // 有官方排名的優先（避免老 voice 擠進前面），同組內按 firstSeenAt desc
+      sorted.sort((a,b)=>{
+        const aHas=Number.isFinite(a.officialOrder)?0:1;
+        const bHas=Number.isFinite(b.officialOrder)?0:1;
+        if(aHas!==bHas) return aHas-bHas;
+        return (b.firstSeenAt||b.lastmod||'').localeCompare(a.firstSeenAt||a.lastmod||'');
+      });
     }else if(sortBy==='oldest'){
-      sorted.sort((a,b)=>(a.firstSeenAt||a.lastmod||'').localeCompare(b.firstSeenAt||b.lastmod||''));
+      sorted.sort((a,b)=>{
+        const aHas=Number.isFinite(a.officialOrder)?0:1;
+        const bHas=Number.isFinite(b.officialOrder)?0:1;
+        if(aHas!==bHas) return aHas-bHas;
+        return (a.firstSeenAt||a.lastmod||'').localeCompare(b.firstSeenAt||b.lastmod||'');
+      });
     }else if(sortBy==='price-asc'){
       sorted.sort((a,b)=>(a.price??1e9)-(b.price??1e9));
     }else if(sortBy==='price-desc'){
@@ -900,7 +920,8 @@ function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboa
   const cnt=oshiIds.size;
   return(
     <div className="page-pad">
-      {showOnboarding&&<Onboarding onDismiss={onDismissOnboarding} loggedIn={loggedIn} members={members} oshiIds={oshiIds} onToggle={onToggle}/>}
+      {showOnboarding&&<Onboarding onDismiss={onDismissOnboarding} loggedIn={loggedIn}/>}
+      <ExplorePicks members={members} oshiIds={oshiIds} onToggle={onToggle}/>
       <div style={{marginBottom:14,marginTop:2}}>
         <div className="page-title">選擇你的推し 💜</div>
         <div className="page-sub">
@@ -1082,8 +1103,29 @@ function ThemeToggle(){
 }
 
 // ─── Onboarding banner（首次訪客顯示） ───
-function Onboarding({onDismiss,loggedIn,members,oshiIds,onToggle}){
+function Onboarding({onDismiss,loggedIn}){
+  return(
+    <div className="onboarding">
+      <span className="onboarding-icon">🌈</span>
+      <div className="onboarding-body">
+        <div className="onboarding-title">歡迎來到推し選擇器！</div>
+        <div>
+          1️⃣ 點頭像選你推的彩虹社成員<br/>
+          2️⃣ 進「💜 我的推し」看周邊商品<br/>
+          3️⃣ {loggedIn?'開啟通知':'登入後開啟通知'}，新品 / 直播都會主動提醒
+        </div>
+      </div>
+      <button className="onboarding-close" onClick={onDismiss} title="不再顯示">×</button>
+    </div>
+  );
+}
+
+// ─── 探索區：🔥 熱門 + 🆕 最近出道（一直可見、可摺疊） ───
+function ExplorePicks({members,oshiIds,onToggle}){
   const[popular,setPopular]=useState(null);
+  const[collapsed,setCollapsed]=useState(()=>{
+    try{return localStorage.getItem('niji_explore_collapsed')==='1';}catch{return false;}
+  });
   useEffect(()=>{
     sb.from('oshi_popular_v').select('member_id,cnt').limit(50).then(({data})=>{
       setPopular(data||[]);
@@ -1091,54 +1133,55 @@ function Onboarding({onDismiss,loggedIn,members,oshiIds,onToggle}){
   },[]);
 
   const memberMap=useMemo(()=>{
-    const m={};
-    members.forEach(x=>{m[x.id]=x;});
-    return m;
+    const m={}; members.forEach(x=>{m[x.id]=x;}); return m;
   },[members]);
 
-  // 熱門：訂閱數 ≥ 1，依數量排，取前 8
   const hot=useMemo(()=>{
     if(!popular) return [];
     return popular
       .filter(p=>memberMap[p.member_id]&&memberMap[p.member_id].active!==false)
-      .slice(0,8)
+      .slice(0,10)
       .map(p=>memberMap[p.member_id]);
   },[popular,memberMap]);
 
-  // 最近出道（取活躍且 debut 最新 8 位）
   const recent=useMemo(()=>{
     return members
       .filter(m=>m.active!==false&&m.debutDate)
       .sort((a,b)=>(a.debutDate<b.debutDate?1:-1))
-      .slice(0,8);
+      .slice(0,10);
   },[members]);
 
+  if(!hot.length && !recent.length) return null;
+  const toggle=()=>{
+    const next=!collapsed;
+    setCollapsed(next);
+    try{localStorage.setItem('niji_explore_collapsed',next?'1':'0');}catch{}
+  };
+
   return(
-    <div className="onboarding">
-      <button className="onboarding-close" onClick={onDismiss} title="不再顯示">×</button>
-      <div style={{display:'flex',alignItems:'flex-start',gap:12,marginBottom:12}}>
-        <span className="onboarding-icon">🌈</span>
-        <div className="onboarding-body">
-          <div className="onboarding-title">歡迎來到推し選擇器！</div>
-          <div>
-            點頭像選推し → 進「💜 我的推し」看商品 + {loggedIn?'開啟':'登入'}通知（新品 / 直播）
-          </div>
-        </div>
-      </div>
-      {hot.length>0&&(
-        <div style={{marginTop:10}}>
-          <div style={{fontSize:11,color:'var(--text2)',marginBottom:6}}>🔥 大家都推</div>
-          <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4}}>
-            {hot.map(m=><QuickPick key={m.id} member={m} selected={oshiIds.has(m.id)} onClick={()=>onToggle(m.id)}/>)}
-          </div>
-        </div>
-      )}
-      {recent.length>0&&(
-        <div style={{marginTop:10}}>
-          <div style={{fontSize:11,color:'var(--text2)',marginBottom:6}}>🆕 最近出道</div>
-          <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:4}}>
-            {recent.map(m=><QuickPick key={m.id} member={m} selected={oshiIds.has(m.id)} onClick={()=>onToggle(m.id)}/>)}
-          </div>
+    <div className="explore-card">
+      <button className="explore-hdr" onClick={toggle}>
+        <span>探索推し</span>
+        <span style={{marginLeft:'auto',fontSize:11,color:'var(--text2)'}}>{collapsed?'展開 ▼':'收起 ▲'}</span>
+      </button>
+      {!collapsed&&(
+        <div className="explore-body">
+          {hot.length>0&&(
+            <div className="explore-row">
+              <div className="explore-label">🔥 大家都推</div>
+              <div className="explore-pics">
+                {hot.map(m=><QuickPick key={m.id} member={m} selected={oshiIds.has(m.id)} onClick={()=>onToggle(m.id)}/>)}
+              </div>
+            </div>
+          )}
+          {recent.length>0&&(
+            <div className="explore-row">
+              <div className="explore-label">🆕 最近出道</div>
+              <div className="explore-pics">
+                {recent.map(m=><QuickPick key={m.id} member={m} selected={oshiIds.has(m.id)} onClick={()=>onToggle(m.id)}/>)}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
