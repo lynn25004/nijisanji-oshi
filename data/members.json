@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-05-03",
+  "lastUpdated": "2026-05-04",
   "members": [
     {
       "id": "mito-tsukino",
@@ -1487,23 +1487,23 @@
       "channelUrl": ""
     },
     {
-      "id": "sophia-valentine",
-      "name": "ソフィア・ヴァレンタイン",
-      "nameEn": "Sophia Valentine",
-      "branch": "JP",
-      "debutDate": "2023-01-15",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/6489a08fe04c4bfc9e77e652f664ac66/liver-face_Sophia_Valentine.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "nozomi-ishigami",
       "name": "石神のぞみ",
       "nameEn": "Ishigami Nozomi",
       "branch": "JP",
       "debutDate": "2023-01-15",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/e1a09f9b02084889a165541da18a6c14/liver-face_Nozomi_Ishigami.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "sophia-valentine",
+      "name": "ソフィア・ヴァレンタイン",
+      "nameEn": "Sophia Valentine",
+      "branch": "JP",
+      "debutDate": "2023-01-15",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/6489a08fe04c4bfc9e77e652f664ac66/liver-face_Sophia_Valentine.png",
       "active": true,
       "color": "",
       "channelUrl": ""
