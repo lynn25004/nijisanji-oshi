@@ -13,6 +13,19 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="推しPicker" />
+  <!-- 社群分享預覽 (LINE / Discord / Twitter / Slack) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="🌈 彩虹社推し選擇器" />
+  <meta property="og:description" content="選你推的彩虹社成員，看官方周邊，收新品 + 直播提醒（email + 瀏覽器推播）" />
+  <meta property="og:image" content="https://lynn25004.github.io/nijisanji-oshi/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url" content="https://lynn25004.github.io/nijisanji-oshi/" />
+  <meta property="og:site_name" content="NIJISANJI Oshi Picker" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="🌈 彩虹社推し選擇器" />
+  <meta name="twitter:description" content="選你推的彩虹社成員，收新品 + 直播提醒" />
+  <meta name="twitter:image" content="https://lynn25004.github.io/nijisanji-oshi/og.png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
@@ -241,13 +254,17 @@
     .stream-hdr.live{color:#ff4444}
     .stream-hdr.live .live-dot{width:8px;height:8px;background:#ff4444;border-radius:50%;animation:blink 1.2s infinite}
     @keyframes blink{50%{opacity:.3}}
-    .stream-card{display:flex;gap:10px;padding:10px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;margin-bottom:8px;text-decoration:none;color:var(--text);transition:all .2s;align-items:flex-start}
+    .stream-card{display:flex;align-items:stretch;background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;margin-bottom:8px;transition:all .2s;overflow:hidden}
     .stream-card:hover{border-color:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 14px var(--shadow)}
     .stream-card.live-card{border-color:#ff4444;background:linear-gradient(135deg,var(--card-bg),rgba(255,68,68,.06))}
+    .stream-card-main{display:flex;flex:1;gap:10px;padding:10px;text-decoration:none;color:var(--text);align-items:flex-start;min-width:0}
     .stream-thumb{width:120px;aspect-ratio:16/9;border-radius:6px;object-fit:cover;background:var(--bg3);flex-shrink:0;position:relative}
     .stream-info{flex:1;min-width:0}
     .stream-title{font-size:13px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:4px}
     .stream-meta{font-size:11px;color:var(--text2);line-height:1.5}
+    .stream-channel{font-size:10px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .cal-btn{display:flex;align-items:center;justify-content:center;width:44px;background:var(--bg);border-left:1px solid var(--card-border);text-decoration:none;font-size:18px;flex-shrink:0;transition:all .2s}
+    .cal-btn:hover{background:var(--accent2);transform:scale(1.05)}
     .stream-meta .badge{display:inline-block;background:var(--bg3);padding:1px 7px;border-radius:8px;margin-right:5px;font-size:10px}
     .stream-meta .badge.live{background:#ff4444;color:#fff}
     .stream-meta .badge.soon{background:var(--grad-pink);color:#fff}
@@ -427,9 +444,25 @@ function MerchCard({p}){
   );
 }
 
-function StreamCard({s,kind}){
+// Google Calendar URL：把直播加入行事曆
+function gcalUrl(s, channelName){
+  const start=new Date(s.start_scheduled||s.available_at);
+  const end=new Date(start.getTime()+60*60*1000);  // 預設 1 小時
+  const fmt=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+  const params=new URLSearchParams({
+    action:'TEMPLATE',
+    text:`🔴 ${channelName||''} ${s.title||''}`.trim(),
+    dates:`${fmt(start)}/${fmt(end)}`,
+    details:`https://www.youtube.com/watch?v=${s.id}\n\n${s.title||''}`,
+    location:`https://www.youtube.com/watch?v=${s.id}`,
+  });
+  return `https://calendar.google.com/calendar/render?${params}`;
+}
+
+function StreamCard({s,kind,showChannel}){
   const url=`https://www.youtube.com/watch?v=${s.id}`;
   const thumb=`https://i.ytimg.com/vi/${s.id}/mqdefault.jpg`;
+  const chName=s.channel?.name||s.channel?.english_name||'';
   let badge=null, when='';
   if(kind==='live'){
     badge=<span className="badge live">🔴 LIVE</span>;
@@ -443,13 +476,19 @@ function StreamCard({s,kind}){
     when=`${fmtClock(s.available_at)} · ${fmtDuration(s.duration)}${fmtRelative(s.available_at)?' · '+fmtRelative(s.available_at):''}`;
   }
   return(
-    <a className={`stream-card ${kind==='live'?'live-card':''}`} href={url} target="_blank" rel="noreferrer">
-      <img className="stream-thumb" src={thumb} alt="" loading="lazy"/>
-      <div className="stream-info">
-        <div className="stream-title">{s.title||'(無標題)'}</div>
-        <div className="stream-meta">{badge}{when}</div>
-      </div>
-    </a>
+    <div className={`stream-card ${kind==='live'?'live-card':''}`}>
+      <a className="stream-card-main" href={url} target="_blank" rel="noreferrer">
+        <img className="stream-thumb" src={thumb} alt="" loading="lazy"/>
+        <div className="stream-info">
+          <div className="stream-title">{s.title||'(無標題)'}</div>
+          <div className="stream-meta">{badge}{when}</div>
+          {showChannel&&chName&&<div className="stream-channel">{chName}</div>}
+        </div>
+      </a>
+      {kind==='upcoming'&&(
+        <a className="cal-btn" href={gcalUrl(s,chName)} target="_blank" rel="noreferrer" title="加入 Google Calendar">📅</a>
+      )}
+    </div>
   );
 }
 
@@ -696,6 +735,50 @@ function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyS
   );
 }
 
+// 首頁直播 widget：顯示「現在 LIVE」+「30 分內開播」
+function LiveNowWidget({members,oshiIds}){
+  const[streams,setStreams]=useState(null);
+  useEffect(()=>{loadStreams().then(setStreams);},[]);
+
+  const data=useMemo(()=>{
+    if(!streams) return null;
+    const oshiMembers=members.filter(m=>oshiIds.has(m.id));
+    const filterByOshi=arr=>{
+      if(!oshiMembers.length) return arr;  // 沒選推し → 顯示全部彩虹社的
+      return arr.filter(s=>oshiMembers.some(m=>matchChannel(s.channel,m)));
+    };
+    const live=filterByOshi(streams.live||[]);
+    const now=Date.now();
+    const upcoming=filterByOshi((streams.upcoming||[]).filter(s=>{
+      const t=new Date(s.start_scheduled).getTime();
+      return t-now<=30*60*1000 && t>now;
+    }));
+    return {live,upcoming,hasOshi:oshiMembers.length>0};
+  },[streams,members,oshiIds]);
+
+  if(!data||(!data.live.length&&!data.upcoming.length)) return null;
+  return(
+    <div style={{marginBottom:14}}>
+      {data.live.length>0&&(
+        <div className="stream-sec">
+          <div className="stream-hdr live">
+            <span className="live-dot"></span>{data.hasOshi?'你推し正在直播':'彩虹社現在直播中'}
+            <span className="pill">{data.live.length}</span>
+          </div>
+          {data.live.slice(0,3).map(s=><StreamCard key={s.id} s={s} kind="live" showChannel/>)}
+          {data.live.length>3&&<div style={{fontSize:11,color:'var(--text2)',textAlign:'center',marginTop:4}}>還有 {data.live.length-3} 場…</div>}
+        </div>
+      )}
+      {data.upcoming.length>0&&(
+        <div className="stream-sec">
+          <div className="stream-hdr">⏰ 30 分內開播<span className="pill">{data.upcoming.length}</span></div>
+          {data.upcoming.slice(0,2).map(s=><StreamCard key={s.id} s={s} kind="upcoming" showChannel/>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboarding,onDismissOnboarding,loggedIn}){
   const[search,setSearch]=useState('');
   const[branch,setBranch]=useState('all');
@@ -710,6 +793,7 @@ function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboa
   return(
     <div className="page-pad">
       {showOnboarding&&<Onboarding onDismiss={onDismissOnboarding} loggedIn={loggedIn}/>}
+      <LiveNowWidget members={members} oshiIds={oshiIds}/>
       <div style={{marginBottom:14,marginTop:2}}>
         <div className="page-title">選擇你的推し 💜</div>
         <div className="page-sub">
