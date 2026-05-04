@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-05-03T17:47:05+00:00",
+  "lastUpdated": "2026-05-04T07:56:13+00:00",
   "social": {
     "mito-tsukino": {
       "youtube": "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A",
@@ -8,7 +8,7 @@
     },
     "kaede-higuchi": {
       "youtube": "https://www.youtube.com/channel/UCsg-YqdqQ-KFF0LNk23BY4A",
-      "twitter": null,
+      "twitter": "https://x.com/Higuchikaede",
       "twitch": null
     },
     "elu": {
@@ -139,7 +139,7 @@
     "himawari-honma": {
       "youtube": "https://www.youtube.com/channel/UC0g1AE0DOjBYnLhkgoRWN1w",
       "twitter": "https://x.com/honmahimawari",
-      "twitch": "https://twitch.tv/honhima"
+      "twitch": null
     },
     "kuzuha": {
       "youtube": "https://www.youtube.com/channel/UCSFCh5NL4qXrAy9u-u2lX3g",
@@ -188,7 +188,7 @@
     },
     "debidebi-debiru": {
       "youtube": "https://www.youtube.com/channel/UCjlmCrq4TP1I4xguOtJ-31w",
-      "twitter": "https://x.com/debidebiru_sama",
+      "twitter": null,
       "twitch": null
     },
     "joe-rikiichi": {
@@ -236,9 +236,9 @@
       "twitter": "https://x.com/KataribeTsumugu",
       "twitch": null
     },
-    "lize-helesta": {
-      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
-      "twitter": "https://x.com/Lize_Helesta",
+    "ange-katrina": {
+      "youtube": "https://www.youtube.com/channel/UCHVXbQzkl3rDfsXWo8xi2qw",
+      "twitter": "https://x.com/ange_katrina_",
       "twitch": null
     },
     "toko-inui": {
@@ -246,9 +246,9 @@
       "twitter": "https://x.com/inui_toko",
       "twitch": null
     },
-    "ange-katrina": {
-      "youtube": "https://www.youtube.com/channel/UCHVXbQzkl3rDfsXWo8xi2qw",
-      "twitter": "https://x.com/ange_katrina_",
+    "lize-helesta": {
+      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
+      "twitter": "https://x.com/Lize_Helesta",
       "twitch": null
     },
     "akina-saegusa": {
@@ -408,7 +408,7 @@
     },
     "ibrahim": {
       "youtube": "https://www.youtube.com/channel/UCmZ1Rbthn-6Jm_qOGjYsh5A",
-      "twitter": null,
+      "twitter": "https://x.com/honmono_ibrahim",
       "twitch": null
     },
     "furen-e-lustario": {
@@ -671,14 +671,14 @@
       "twitter": "https://x.com/Ver_Vermillion",
       "twitch": null
     },
-    "sophia-valentine": {
-      "youtube": "https://www.youtube.com/channel/UCivwPlOp0ojnMPZj5pNOPPA",
-      "twitter": "https://x.com/SophiaV214",
-      "twitch": null
-    },
     "nozomi-ishigami": {
       "youtube": "https://www.youtube.com/channel/UCtLfA_qUqCJtjXJM2ZR_keg",
       "twitter": "https://x.com/I_Nozomi_",
+      "twitch": null
+    },
+    "sophia-valentine": {
+      "youtube": "https://www.youtube.com/channel/UCivwPlOp0ojnMPZj5pNOPPA",
+      "twitter": "https://x.com/SophiaV214",
       "twitch": null
     },
     "toru-koshimizu": {
@@ -713,7 +713,7 @@
     },
     "ittetsu-saiki": {
       "youtube": "https://www.youtube.com/channel/UCy8P3o5XlMpJGQY4WugzdNA",
-      "twitter": null,
+      "twitter": "https://x.com/Saiki_Supadari",
       "twitch": null
     },
     "rito-usami": {
@@ -768,7 +768,7 @@
     },
     "ruri-shioriha": {
       "youtube": "https://www.youtube.com/channel/UC7_MFM9b8hp5kuTSpa8WyOQ",
-      "twitter": "https://x.com/Ruri_4ori8",
+      "twitter": null,
       "twitch": null
     },
     "milan-kestrel": {
@@ -918,7 +918,7 @@
     },
     "tsubasa-hanakago": {
       "youtube": "https://www.youtube.com/channel/UCcswLVd6KGBf5mIdzeO83bA",
-      "twitter": "https://x.com/2273xxx",
+      "twitter": null,
       "twitch": null
     },
     "yuno-shinomiya": {
@@ -975,11 +975,6 @@
       "youtube": "https://www.youtube.com/channel/UCzcuYIyP-1YcXC96t9J5yWQ",
       "twitter": "https://x.com/Eita_2434",
       "twitch": "https://twitch.tv/eita_2434"
-    },
-    "_comment": {
-      "youtube": null,
-      "twitter": null,
-      "twitch": null
     }
   }
 }
