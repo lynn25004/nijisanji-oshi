@@ -1032,21 +1032,21 @@ function LoginModal({onClose}){
               <h2 style={{marginBottom:6}}>驗證碼已寄出</h2>
               <p style={{textAlign:'center',marginBottom:14,fontSize:13}}>
                 信箱：<b style={{color:'var(--text)'}}>{email}</b><br/>
-                <span style={{color:'var(--text3)',fontSize:11}}>請輸入信件中的 6 位數驗證碼（5 分鐘內有效，沒收到請看垃圾信匣）</span>
+                <span style={{color:'var(--text3)',fontSize:11}}>請輸入信件中的驗證碼（5 分鐘內有效，沒收到請看垃圾信匣）</span>
               </p>
             </div>
             <input
-              type="text" inputMode="numeric" pattern="[0-9]*"
-              placeholder="6 位數驗證碼"
+              type="text" inputMode="text" autoCapitalize="off" autoCorrect="off" spellCheck={false}
+              placeholder="驗證碼"
               value={code}
               onChange={e=>setCode(e.target.value)}
               onKeyDown={e=>{if(e.key==='Enter') verifyCode();}}
               autoFocus
-              style={{textAlign:'center',fontSize:22,letterSpacing:6,fontFamily:'monospace'}}
+              style={{textAlign:'center',fontSize:22,letterSpacing:4,fontFamily:'monospace'}}
             />
             <div className="modal-actions">
               <button className="modal-cancel" onClick={onClose}>取消</button>
-              <button className="modal-submit" onClick={verifyCode} disabled={verifying||code.replace(/\s/g,'').length<6}>
+              <button className="modal-submit" onClick={verifyCode} disabled={verifying||code.replace(/\s/g,'').length<4}>
                 {verifying?'驗證中…':'登入'}
               </button>
             </div>
