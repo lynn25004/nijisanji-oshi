@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-05-04",
+  "lastUpdated": "2026-05-05",
   "members": [
     {
       "id": "mito-tsukino",
@@ -519,12 +519,12 @@
       "channelUrl": ""
     },
     {
-      "id": "ange-katrina",
-      "name": "アンジュ・カトリーナ",
-      "nameEn": "Ange Katrina",
+      "id": "lize-helesta",
+      "name": "リゼ・ヘルエスタ",
+      "nameEn": "Lize Helesta",
       "branch": "JP",
       "debutDate": "2019-03-21",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/15670f33fae545de9fc5dff585be332c/liver-face_Ange_Katrina.png",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/47f33a1d55ff4c40aa815eaff1be3aab/liver-face_Lize_Helesta.png",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -541,12 +541,12 @@
       "channelUrl": ""
     },
     {
-      "id": "lize-helesta",
-      "name": "リゼ・ヘルエスタ",
-      "nameEn": "Lize Helesta",
+      "id": "ange-katrina",
+      "name": "アンジュ・カトリーナ",
+      "nameEn": "Ange Katrina",
       "branch": "JP",
       "debutDate": "2019-03-21",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/47f33a1d55ff4c40aa815eaff1be3aab/liver-face_Lize_Helesta.png",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/15670f33fae545de9fc5dff585be332c/liver-face_Ange_Katrina.png",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -2070,23 +2070,23 @@
       "channelUrl": ""
     },
     {
-      "id": "reina",
-      "name": "Rei7",
-      "nameEn": "Reina",
-      "branch": "JP",
-      "debutDate": "2026-04-18",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/d52c689962e940d2b422753e0fecd744/liver-face_Rei7.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "kotone-mikogami",
       "name": "御子神琴音",
       "nameEn": "Mikogami Kotone",
       "branch": "JP",
       "debutDate": "2026-04-18",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/ea9e654925fe4b5ab70f75ed5c9bec16/liver-face_Kotone_Mikogami.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "reina",
+      "name": "Rei7",
+      "nameEn": "Reina",
+      "branch": "JP",
+      "debutDate": "2026-04-18",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/d52c689962e940d2b422753e0fecd744/liver-face_Rei7.png",
       "active": true,
       "color": "",
       "channelUrl": ""
