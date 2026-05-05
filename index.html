@@ -369,16 +369,26 @@ async function loadSocial(){
 // 不放在 main 避免污染 git log
 const STREAMS_URL='https://raw.githubusercontent.com/lynn25004/nijisanji-oshi/data/streams.json';
 let _streamsCache=null;
-async function loadStreams(){
-  if(_streamsCache) return _streamsCache;
+async function loadStreams(force){
+  if(_streamsCache && !force) return _streamsCache;
   try{
-    // 加 timestamp 規避 raw.githubusercontent CDN 5 分鐘快取
-    const t=Math.floor(Date.now()/300000);
+    // force 模式或預設：每次都加新 timestamp 強制 refetch
+    const t=force?Date.now():Math.floor(Date.now()/60000);  // 1 分鐘粒度
     const r=await fetch(`${STREAMS_URL}?t=${t}`,{cache:'no-cache'});
-    if(!r.ok) return null;
+    if(!r.ok) return _streamsCache;  // 失敗回前次值
     _streamsCache=await r.json();
     return _streamsCache;
-  }catch{return null;}
+  }catch{return _streamsCache;}
+}
+
+// 全域：回到 tab 或 PWA 重新顯示時，自動 refetch streams
+if(typeof document!=='undefined'){
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'){
+      loadStreams(true);  // 強制 refetch（回前景時抓最新）
+      window.dispatchEvent(new CustomEvent('streams-refresh'));
+    }
+  });
 }
 
 // 過濾『假 live』：已結束 / 太久沒更新 / 已有 duration
@@ -519,7 +529,12 @@ function StreamCard({s,kind,showChannel}){
 
 function StreamsForMember({member}){
   const[streams,setStreams]=useState(null);
-  useEffect(()=>{loadStreams().then(setStreams);},[]);
+  useEffect(()=>{
+    loadStreams().then(setStreams);
+    const onRefresh=()=>loadStreams(true).then(setStreams);
+    window.addEventListener('streams-refresh',onRefresh);
+    return()=>window.removeEventListener('streams-refresh',onRefresh);
+  },[]);
 
   const filtered=useMemo(()=>{
     if(!streams) return null;
@@ -551,7 +566,7 @@ function StreamsForMember({member}){
             ⏰ 接下來
             <span className="pill">{filtered.upcoming.length}</span>
           </div>
-          {filtered.upcoming.slice(0,3).map(s=><StreamCard key={s.id} s={s} kind="upcoming"/>)}
+          {filtered.upcoming.map(s=><StreamCard key={s.id} s={s} kind="upcoming"/>)}
         </div>
       )}
       {filtered.past.length>0&&(
@@ -865,7 +880,12 @@ function DeleteAccountBtn(){
 // 首頁直播 widget：顯示「現在 LIVE」+「30 分內開播」
 function LiveNowWidget({members,oshiIds}){
   const[streams,setStreams]=useState(null);
-  useEffect(()=>{loadStreams().then(setStreams);},[]);
+  useEffect(()=>{
+    loadStreams().then(setStreams);
+    const onRefresh=()=>loadStreams(true).then(setStreams);
+    window.addEventListener('streams-refresh',onRefresh);
+    return()=>window.removeEventListener('streams-refresh',onRefresh);
+  },[]);
 
   const data=useMemo(()=>{
     if(!streams) return null;
@@ -893,14 +913,13 @@ function LiveNowWidget({members,oshiIds}){
             <span className="live-dot"></span>{data.hasOshi?'你推し正在直播':'彩虹社現在直播中'}
             <span className="pill">{data.live.length}</span>
           </div>
-          {data.live.slice(0,3).map(s=><StreamCard key={s.id} s={s} kind="live" showChannel/>)}
-          {data.live.length>3&&<div style={{fontSize:11,color:'var(--text2)',textAlign:'center',marginTop:4}}>還有 {data.live.length-3} 場…</div>}
+          {data.live.map(s=><StreamCard key={s.id} s={s} kind="live" showChannel/>)}
         </div>
       )}
       {data.upcoming.length>0&&(
         <div className="stream-sec">
           <div className="stream-hdr">⏰ 30 分內開播<span className="pill">{data.upcoming.length}</span></div>
-          {data.upcoming.slice(0,2).map(s=><StreamCard key={s.id} s={s} kind="upcoming" showChannel/>)}
+          {data.upcoming.map(s=><StreamCard key={s.id} s={s} kind="upcoming" showChannel/>)}
         </div>
       )}
     </div>

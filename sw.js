@@ -1,5 +1,5 @@
 // Service Worker：Web Push + 離線基本資源快取
-const CACHE_NAME = 'oshi-v3';
+const CACHE_NAME = 'oshi-v5';
 const CORE = [
   './',
   './index.html',

@@ -2,7 +2,7 @@ name: 每 15 分鐘更新直播資料 (data branch)
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 concurrency:
