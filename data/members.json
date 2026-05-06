@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-05-05",
+  "lastUpdated": "2026-05-06",
   "members": [
     {
       "id": "mito-tsukino",
@@ -519,6 +519,17 @@
       "channelUrl": ""
     },
     {
+      "id": "ange-katrina",
+      "name": "アンジュ・カトリーナ",
+      "nameEn": "Ange Katrina",
+      "branch": "JP",
+      "debutDate": "2019-03-21",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/15670f33fae545de9fc5dff585be332c/liver-face_Ange_Katrina.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
       "id": "lize-helesta",
       "name": "リゼ・ヘルエスタ",
       "nameEn": "Lize Helesta",
@@ -536,17 +547,6 @@
       "branch": "JP",
       "debutDate": "2019-03-21",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/e901f31dd23841438d5ed3113828353b/liver-face_Toko_Inui.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
-      "id": "ange-katrina",
-      "name": "アンジュ・カトリーナ",
-      "nameEn": "Ange Katrina",
-      "branch": "JP",
-      "debutDate": "2019-03-21",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/15670f33fae545de9fc5dff585be332c/liver-face_Ange_Katrina.png",
       "active": true,
       "color": "",
       "channelUrl": ""
