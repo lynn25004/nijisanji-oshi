@@ -91,6 +91,10 @@
     .member-card.selected{border-color:var(--accent1);background:var(--selected-bg);box-shadow:0 0 0 2px rgba(255,107,157,.25),0 8px 20px rgba(255,107,157,.18);animation:pop .25s ease-out}
     .member-card.selected .member-avatar,.member-card.selected .avatar-fallback{box-shadow:0 0 0 2px var(--accent1)}
     .member-card.inactive{opacity:.45}
+    .live-badge{position:absolute;top:-7px;left:50%;transform:translateX(-50%);background:#ff2424;color:#fff;font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px;letter-spacing:.5px;box-shadow:0 0 0 2px rgba(255,36,36,.25),0 2px 6px rgba(255,36,36,.4);animation:live-pulse 1.6s ease-out infinite;z-index:3;white-space:nowrap}
+    @keyframes live-pulse{0%,100%{box-shadow:0 0 0 2px rgba(255,36,36,.25),0 2px 6px rgba(255,36,36,.4)}50%{box-shadow:0 0 0 8px rgba(255,36,36,0),0 2px 6px rgba(255,36,36,.4)}}
+    .member-card.is-live{border-color:#ff4444;box-shadow:0 0 0 1px rgba(255,68,68,.2)}
+    .oshi-card.is-live{border-color:#ff4444;background:linear-gradient(135deg,var(--card-bg),rgba(255,68,68,.06));box-shadow:0 0 0 1px rgba(255,68,68,.2)}
     @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.05) translateY(-2px)}100%{transform:scale(1) translateY(0)}}
     .heart-badge{position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:50%;background:var(--accent1);display:flex;align-items:center;justify-content:center;font-size:12px;opacity:0;transform:scale(.7);transition:all .18s}
     .member-card.selected .heart-badge{opacity:1;transform:scale(1)}
@@ -746,7 +750,7 @@ function MerchPage({member}){
   );
 }
 
-function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyShared,notify,onToggleEmail,onTogglePush,loggedIn,onLoginClick}){
+function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyShared,notify,onToggleEmail,onTogglePush,loggedIn,onLoginClick,liveMemberIds}){
   const list=members.filter(m=>oshiIds.has(m.id));
   const[copyMsg,setCopyMsg]=useState('');
   const share=async()=>{
@@ -816,8 +820,9 @@ function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyS
         {list.map(m=>{
           const c=m.color||hc(m.id||'x');
           return(
-            <div key={m.id} className="oshi-card" onClick={()=>onViewMerch(m)}>
+            <div key={m.id} className={`oshi-card ${liveMemberIds&&liveMemberIds.has(m.id)?'is-live':''}`} onClick={()=>onViewMerch(m)}>
               <button className="remove-btn" onClick={e=>{e.stopPropagation();onRemove(m.id);}}>×</button>
+              {liveMemberIds&&liveMemberIds.has(m.id)&&<span className="live-badge">🔴 LIVE</span>}
               <div style={{width:76,height:76,borderRadius:'50%',padding:2,background:`linear-gradient(135deg,${c},${lt(c)})`}}>
                 <div style={{width:72,height:72,borderRadius:'50%',overflow:'hidden'}}><Avatar member={m} size={72}/></div>
               </div>
@@ -926,7 +931,7 @@ function LiveNowWidget({members,oshiIds}){
   );
 }
 
-function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboarding,onDismissOnboarding,loggedIn}){
+function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboarding,onDismissOnboarding,loggedIn,liveMemberIds}){
   const[search,setSearch]=useState('');
   const[branch,setBranch]=useState('all');
   const branches=useMemo(()=>[...new Set(members.map(m=>m.branch))].sort(),[members]);
@@ -962,9 +967,10 @@ function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboa
             <div className="empty-sub">換個關鍵字或切換分部試試</div>
           </div>
         ):filtered.map(m=>(
-          <div key={m.id} className={`member-card ${oshiIds.has(m.id)?'selected':''} ${m.active===false?'inactive':''}`} onClick={()=>onToggle(m.id)}>
+          <div key={m.id} className={`member-card ${oshiIds.has(m.id)?'selected':''} ${m.active===false?'inactive':''} ${liveMemberIds&&liveMemberIds.has(m.id)?'is-live':''}`} onClick={()=>onToggle(m.id)}>
             <div className="heart-badge">♥</div>
             <span className={`branch-tag branch-${m.branch}`}>{m.branch}</span>
+            {liveMemberIds&&liveMemberIds.has(m.id)&&<span className="live-badge">🔴 LIVE</span>}
             <Avatar member={m} size={64}/>
             <div className="member-name">{m.name}</div>
             {m.nameEn&&m.nameEn!==m.name&&<div className="member-name-en">{m.nameEn}</div>}
@@ -1282,6 +1288,7 @@ function App(){
   const[showOnboarding,setShowOnboarding]=useState(()=>{
     try{return !localStorage.getItem('niji_onboarding_dismissed');}catch{return true;}
   });
+  const[liveMemberIds,setLiveMemberIds]=useState(()=>new Set());
   const dismissOnboarding=useCallback(()=>{
     setShowOnboarding(false);
     try{localStorage.setItem('niji_onboarding_dismissed','1');}catch{}
@@ -1320,6 +1327,27 @@ function App(){
       setMembers(s);setLastUpdated(d.lastUpdated||'');
     }).catch(()=>setMembers([])).finally(()=>setLoading(false));
   },[]);
+
+  // ─── 計算現在直播中的 member id Set ───
+  useEffect(()=>{
+    if(!members.length) return;
+    const compute=async()=>{
+      const streams=await loadStreams();
+      if(!streams) return;
+      const liveStreams=(streams.live||[]).filter(isActuallyLive);
+      const ids=new Set();
+      liveStreams.forEach(s=>{
+        members.forEach(m=>{
+          if(matchChannel(s.channel,m)) ids.add(m.id);
+        });
+      });
+      setLiveMemberIds(ids);
+    };
+    compute();
+    const onRefresh=()=>compute();
+    window.addEventListener('streams-refresh',onRefresh);
+    return()=>window.removeEventListener('streams-refresh',onRefresh);
+  },[members]);
 
   // ─── Supabase auth + sync ───
   useEffect(()=>{
@@ -1450,8 +1478,8 @@ function App(){
       {loading
         ? <div className="page-pad"><MemberSkeleton/></div>
         : <>
-          {view==='select'&&<MemberSelect members={members} lastUpdated={lastUpdated} oshiIds={oshiIds} onToggle={toggleOshi} onViewOshi={()=>setView('oshi')} showOnboarding={showOnboarding&&!isShared} onDismissOnboarding={dismissOnboarding} loggedIn={!!session}/>}
-          {view==='oshi'&&<OshiPage members={members} oshiIds={oshiIds} onRemove={removeOshi} onViewMerch={m=>{setCurMember(m);setView('merch');}} onBack={()=>setView('select')} isShared={isShared} onApplyShared={applySharedToSelf} notify={notify} onToggleEmail={toggleEmail} onTogglePush={togglePush} loggedIn={!!session} onLoginClick={()=>setShowLogin(true)}/>}
+          {view==='select'&&<MemberSelect members={members} lastUpdated={lastUpdated} oshiIds={oshiIds} onToggle={toggleOshi} onViewOshi={()=>setView('oshi')} showOnboarding={showOnboarding&&!isShared} onDismissOnboarding={dismissOnboarding} loggedIn={!!session} liveMemberIds={liveMemberIds}/>}
+          {view==='oshi'&&<OshiPage members={members} oshiIds={oshiIds} onRemove={removeOshi} onViewMerch={m=>{setCurMember(m);setView('merch');}} onBack={()=>setView('select')} isShared={isShared} onApplyShared={applySharedToSelf} notify={notify} onToggleEmail={toggleEmail} onTogglePush={togglePush} loggedIn={!!session} onLoginClick={()=>setShowLogin(true)} liveMemberIds={liveMemberIds}/>}
           {view==='merch'&&curMember&&<MerchPage member={curMember}/>}
         </>
       }
