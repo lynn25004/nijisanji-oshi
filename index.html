@@ -1122,9 +1122,9 @@ function NotifyCard({icon,title,sub,emailOn,pushOn,onToggleEmail,onTogglePush}){
 const ToastCtx = React.createContext(()=>{});
 function ToastProvider({children}){
   const[items,setItems]=useState([]);
-  const push=useCallback((text,type='info',ms=2600)=>{
+  const push=useCallback((text,type='info',ms=2600,onClick=null)=>{
     const id=Math.random().toString(36).slice(2);
-    setItems(s=>[...s,{id,text,type}]);
+    setItems(s=>[...s,{id,text,type,onClick}]);
     setTimeout(()=>setItems(s=>s.filter(t=>t.id!==id)),ms);
   },[]);
   return(
@@ -1132,7 +1132,10 @@ function ToastProvider({children}){
       {children}
       <div className="toast-wrap">
         {items.map(t=>(
-          <div key={t.id} className={`toast ${t.type}`}>
+          <div key={t.id}
+            className={`toast ${t.type}`}
+            onClick={t.onClick?()=>{t.onClick();setItems(s=>s.filter(x=>x.id!==t.id));}:undefined}
+            style={t.onClick?{cursor:'pointer',pointerEvents:'auto'}:undefined}>
             {t.type==='ok'&&<span>✅</span>}
             {t.type==='err'&&<span>⚠️</span>}
             {t.type==='info'&&<span>💡</span>}
@@ -1328,26 +1331,57 @@ function App(){
     }).catch(()=>setMembers([])).finally(()=>setLoading(false));
   },[]);
 
-  // ─── 計算現在直播中的 member id Set ───
+  // ─── 計算現在直播中的 member id Set + 偵測新開播 → toast ───
+  const knownLiveRef=useRef(new Map());  // memberId → streamId（記憶上次看到的，避免重複通知）
+  const seenInTabRef=useRef(new Set());  // 此次 tab 開啟期間已 toast 過的 streamId
+  const isFirstComputeRef=useRef(true);
   useEffect(()=>{
     if(!members.length) return;
-    const compute=async()=>{
-      const streams=await loadStreams();
+    const compute=async(force=false)=>{
+      const streams=await loadStreams(force);
       if(!streams) return;
       const liveStreams=(streams.live||[]).filter(isActuallyLive);
       const ids=new Set();
+      const currentLive=new Map();  // memberId → {stream, member}
       liveStreams.forEach(s=>{
         members.forEach(m=>{
-          if(matchChannel(s.channel,m)) ids.add(m.id);
+          if(matchChannel(s.channel,m)){
+            ids.add(m.id);
+            if(!currentLive.has(m.id)) currentLive.set(m.id,{stream:s,member:m});
+          }
         });
       });
       setLiveMemberIds(ids);
+
+      // 偵測「新開播」→ toast 通知（推し才算）
+      // 第一次 compute 不通知（避免一打開網站就跳一堆已存在的直播）
+      if(!isFirstComputeRef.current){
+        currentLive.forEach((v,mid)=>{
+          if(!oshiIds.has(mid)) return;
+          const prevStream=knownLiveRef.current.get(mid);
+          const isNew=prevStream!==v.stream.id && !seenInTabRef.current.has(v.stream.id);
+          if(isNew){
+            seenInTabRef.current.add(v.stream.id);
+            const url=`https://www.youtube.com/watch?v=${v.stream.id}`;
+            toast(`🔴 ${v.member.name} 開直播了！點此前往`,'info',8000,()=>window.open(url,'_blank'));
+          }
+        });
+      }
+      knownLiveRef.current=new Map([...currentLive].map(([k,v])=>[k,v.stream.id]));
+      isFirstComputeRef.current=false;
     };
     compute();
-    const onRefresh=()=>compute();
+    const onRefresh=()=>compute(true);
     window.addEventListener('streams-refresh',onRefresh);
-    return()=>window.removeEventListener('streams-refresh',onRefresh);
-  },[members]);
+    // 每 60 秒主動 refetch（你開著 PWA 時也要即時偵測新開播）
+    const intv=setInterval(()=>{
+      if(document.visibilityState==='visible') compute(true);
+    },60000);
+    return()=>{
+      window.removeEventListener('streams-refresh',onRefresh);
+      clearInterval(intv);
+    };
+  },[members,oshiIds,toast]);
 
   // ─── Supabase auth + sync ───
   useEffect(()=>{
