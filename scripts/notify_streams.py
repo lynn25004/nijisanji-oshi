@@ -306,7 +306,17 @@ def main():
                     log_notify(uid, [(stream["id"], stream["_kind"], "push")])
                     sent_push += 1
 
+    # 統計：多少 user 想收通知 vs 有交集
+    want_any = sum(1 for s in settings_map.values() if s.get("stream_email_enabled") or s.get("stream_push_enabled"))
+    matched_users = sum(
+        1 for uid, st in settings_map.items()
+        if (st.get("stream_email_enabled") or st.get("stream_push_enabled"))
+        and any(mid in oshi_by_user.get(uid, set()) for _, mids in stream_members for mid in mids)
+    )
     print(f"完成：email {sent_email} 封、push {sent_push} 則")
+    print(f"  訂閱直播通知者 {want_any} 人，其中 {matched_users} 人推し有在直播 / 即將直播")
+    if want_any > 0 and matched_users == 0:
+        print(f"  → 未寄信屬正常：訂閱者推し清單跟當下 {len(stream_members)} 場 live/upcoming 沒交集")
 
 
 def log_notify(user_id, items):
