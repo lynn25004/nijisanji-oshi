@@ -171,13 +171,13 @@ def send_webpush(sub, payload_json):
     except WebPushException as e:
         code = e.response.status_code if e.response else 0
         body = ""
-        try: body = e.response.text[:200] if e.response else ""
+        try: body = e.response.text[:300] if e.response else ""
         except Exception: pass
         if code in (404, 410):
             sb_request("DELETE", f"oshi_push_subscriptions?id=eq.{sub['id']}")
-            print(f"[push] {code} → 已刪過期 sub id={sub['id']} (endpoint={sub['endpoint'][:60]})", file=sys.stderr)
+            print(f"[push] {code} → 已刪過期 sub id={sub['id']}", file=sys.stderr)
         else:
-            print(f"[push FAIL] sub_id={sub['id']} code={code} endpoint={sub['endpoint'][:60]} body={body!r}", file=sys.stderr)
+            print(f"[push FAIL] sub_id={sub['id']} code={code} msg={str(e)[:300]!r} body={body!r}", file=sys.stderr)
         return False, code, str(e)
     except Exception as e:
         print(f"[push EXCEPTION] sub_id={sub['id']} {type(e).__name__}: {e}", file=sys.stderr)
