@@ -251,7 +251,9 @@ def main():
         if not (want_email or want_push):
             continue
         my_oshi = oshi_by_user.get(uid, set())
+        print(f"[debug] uid={uid[:8]} want_email={want_email} want_push={want_push} oshi={len(my_oshi)} push_subs={len(push_by_user.get(uid,[]))}", file=sys.stderr)
         if not my_oshi:
+            print(f"[debug]   skip: no oshi", file=sys.stderr)
             continue
 
         my_streams = []
@@ -259,6 +261,7 @@ def main():
             hit = [mid for mid in mids if mid in my_oshi]
             if hit:
                 my_streams.append((stream, hit))
+        print(f"[debug]   matched my_streams={len(my_streams)}", file=sys.stderr)
         if not my_streams:
             continue
 
