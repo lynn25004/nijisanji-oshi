@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-05-09",
+  "lastUpdated": "2026-05-10",
   "members": [
     {
       "id": "mito-tsukino",
@@ -519,17 +519,6 @@
       "channelUrl": ""
     },
     {
-      "id": "lize-helesta",
-      "name": "リゼ・ヘルエスタ",
-      "nameEn": "Lize Helesta",
-      "branch": "JP",
-      "debutDate": "2019-03-21",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/47f33a1d55ff4c40aa815eaff1be3aab/liver-face_Lize_Helesta.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "toko-inui",
       "name": "戌亥とこ",
       "nameEn": "Inui Toko",
@@ -547,6 +536,17 @@
       "branch": "JP",
       "debutDate": "2019-03-21",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/15670f33fae545de9fc5dff585be332c/liver-face_Ange_Katrina.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "lize-helesta",
+      "name": "リゼ・ヘルエスタ",
+      "nameEn": "Lize Helesta",
+      "branch": "JP",
+      "debutDate": "2019-03-21",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/47f33a1d55ff4c40aa815eaff1be3aab/liver-face_Lize_Helesta.png",
       "active": true,
       "color": "",
       "channelUrl": ""
