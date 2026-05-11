@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-05-04T07:56:13+00:00",
+  "lastUpdated": "2026-05-11T08:34:23+00:00",
   "social": {
     "mito-tsukino": {
       "youtube": "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A",
@@ -139,7 +139,7 @@
     "himawari-honma": {
       "youtube": "https://www.youtube.com/channel/UC0g1AE0DOjBYnLhkgoRWN1w",
       "twitter": "https://x.com/honmahimawari",
-      "twitch": null
+      "twitch": "https://twitch.tv/honhima"
     },
     "kuzuha": {
       "youtube": "https://www.youtube.com/channel/UCSFCh5NL4qXrAy9u-u2lX3g",
@@ -188,7 +188,7 @@
     },
     "debidebi-debiru": {
       "youtube": "https://www.youtube.com/channel/UCjlmCrq4TP1I4xguOtJ-31w",
-      "twitter": null,
+      "twitter": "https://x.com/debidebiru_sama",
       "twitch": null
     },
     "joe-rikiichi": {
@@ -236,9 +236,9 @@
       "twitter": "https://x.com/KataribeTsumugu",
       "twitch": null
     },
-    "ange-katrina": {
-      "youtube": "https://www.youtube.com/channel/UCHVXbQzkl3rDfsXWo8xi2qw",
-      "twitter": "https://x.com/ange_katrina_",
+    "lize-helesta": {
+      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
+      "twitter": "https://x.com/Lize_Helesta",
       "twitch": null
     },
     "toko-inui": {
@@ -246,9 +246,9 @@
       "twitter": "https://x.com/inui_toko",
       "twitch": null
     },
-    "lize-helesta": {
-      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
-      "twitter": "https://x.com/Lize_Helesta",
+    "ange-katrina": {
+      "youtube": "https://www.youtube.com/channel/UCHVXbQzkl3rDfsXWo8xi2qw",
+      "twitter": "https://x.com/ange_katrina_",
       "twitch": null
     },
     "akina-saegusa": {
@@ -549,7 +549,7 @@
     "ha-yun": {
       "youtube": "https://www.youtube.com/channel/UCrhhJPNsOqzNIkUfTABoSpg",
       "twitter": "https://x.com/HaYun2434",
-      "twitch": "https://twitch.tv/hayun2434"
+      "twitch": null
     },
     "na-sera": {
       "youtube": "https://www.youtube.com/channel/UCX88Pe54pxbJDSGIyGrzNdg",
@@ -748,7 +748,7 @@
     },
     "vantacrow-bringer": {
       "youtube": "https://www.youtube.com/channel/UCpYf6C9QsP_BRf97vLuXlIA",
-      "twitter": "https://x.com/SaJi_VT",
+      "twitter": null,
       "twitch": null
     },
     "yu-q-wilson": {
@@ -768,7 +768,7 @@
     },
     "ruri-shioriha": {
       "youtube": "https://www.youtube.com/channel/UC7_MFM9b8hp5kuTSpa8WyOQ",
-      "twitter": null,
+      "twitter": "https://x.com/Ruri_4ori8",
       "twitch": null
     },
     "milan-kestrel": {
@@ -918,7 +918,7 @@
     },
     "tsubasa-hanakago": {
       "youtube": "https://www.youtube.com/channel/UCcswLVd6KGBf5mIdzeO83bA",
-      "twitter": null,
+      "twitter": "https://x.com/2273xxx",
       "twitch": null
     },
     "yuno-shinomiya": {
@@ -936,25 +936,25 @@
       "twitter": "https://x.com/shirasa_ayane",
       "twitch": null
     },
-    "reina": {
-      "youtube": "https://www.youtube.com/channel/UC_4QF0dL-9XI9VajsNkMtmQ",
-      "twitter": "https://x.com/Rei7_2434",
-      "twitch": "https://twitch.tv/rei7_2434"
-    },
     "kotone-mikogami": {
       "youtube": "https://www.youtube.com/channel/UCwjlRIySBvZ-kLV5bfjya4A",
       "twitter": "https://x.com/Mikogami_Kotone",
       "twitch": "https://twitch.tv/mikogami_kotone"
     },
-    "rayon": {
-      "youtube": "https://www.youtube.com/channel/UCsxs_R8xnsQN4t-F_3qQ8PQ",
-      "twitter": "https://x.com/Rayon_2434",
-      "twitch": "https://twitch.tv/rayon_2434"
+    "reina": {
+      "youtube": "https://www.youtube.com/channel/UC_4QF0dL-9XI9VajsNkMtmQ",
+      "twitter": "https://x.com/Rei7_2434",
+      "twitch": "https://twitch.tv/rei7_2434"
     },
     "daichi-tsukahara": {
       "youtube": "https://www.youtube.com/channel/UC9HYkiQZ1_b3J_F8gc12eaA",
       "twitter": "https://x.com/BIG_Tsukahara",
       "twitch": "https://twitch.tv/big_tsukahara"
+    },
+    "rayon": {
+      "youtube": "https://www.youtube.com/channel/UCsxs_R8xnsQN4t-F_3qQ8PQ",
+      "twitter": "https://x.com/Rayon_2434",
+      "twitch": "https://twitch.tv/rayon_2434"
     },
     "ayumu-senri": {
       "youtube": "https://www.youtube.com/channel/UC5Qv2tPOI38OcnqOdUKkn7Q",
