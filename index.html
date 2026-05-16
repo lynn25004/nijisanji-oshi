@@ -589,15 +589,19 @@ function StreamsForMember({member}){
 function MerchPage({member}){
   const[data,setData]=useState(null);
   const[err,setErr]=useState('');
+  const[retryTick,setRetryTick]=useState(0);
   const[social,setSocial]=useState(null);
   const[sortBy,setSortBy]=useState('official');  // official / newest / oldest / price-asc / price-desc
   const[unitFilter,setUnitFilter]=useState('');  // unit (categry) 篩選
 
   useEffect(()=>{
     setErr('');
+    setData(null);
+    // retry 時把 module-level cache 清掉
+    if(retryTick>0) _productsCache=null;
     loadProducts().then(setData).catch(e=>setErr(e.message));
     loadSocial().then(s=>setSocial(s?.social?.[member.id]||null));
-  },[member.id]);
+  },[member.id,retryTick]);
 
   const matchedAll=useMemo(()=>{
     if(!data||!member.name) return[];
@@ -690,10 +694,17 @@ function MerchPage({member}){
 
       {err&&(
         <div className="merch-error">
-          ⚠️ 無法載入商品索引：{err}<br/>
-          <span style={{fontSize:11}}>請重新整理頁面，或直接
-            <a href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer" style={{color:'#ffb3b3',marginLeft:4}}>前往 shop.nijisanji.jp 搜尋</a>
-          </span>
+          ⚠️ 無法載入商品索引：{err}
+          <div style={{marginTop:8,display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
+            <button
+              type="button"
+              onClick={()=>setRetryTick(t=>t+1)}
+              style={{background:'rgba(255,200,200,.15)',border:'1px solid rgba(255,100,100,.4)',color:'#ffb3b3',padding:'4px 12px',borderRadius:14,cursor:'pointer',fontSize:12,fontFamily:'inherit'}}
+            >
+              🔄 重試
+            </button>
+            <a href={`${STORE}/search?q=${searchQ}`} target="_blank" rel="noreferrer" style={{color:'#ffb3b3',fontSize:11}}>或前往 shop.nijisanji.jp 搜尋 →</a>
+          </div>
         </div>
       )}
 
