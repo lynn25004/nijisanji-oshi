@@ -719,15 +719,23 @@ function MerchPage({member}){
             </select>
           )}
           {(sortBy!=='official'||unitFilter)&&(
-            <button className="merch-clear" onClick={()=>{setSortBy('official');setUnitFilter('');}}>✕ 重設</button>
+            <button className="merch-clear" aria-label="重設排序與分類篩選" onClick={()=>{setSortBy('official');setUnitFilter('');}}>✕ 重設</button>
           )}
         </div>
       )}
 
       {!data&&!err&&(
-        <div className="merch-loading">
-          <div className="spinner"></div>
-          <div>載入商品索引中…</div>
+        <div className="merch-grid">
+          {Array.from({length:8}).map((_,i)=>(
+            <div key={i} className="merch-card" style={{cursor:'default'}}>
+              <div className="merch-img skel" style={{borderRadius:0}}></div>
+              <div className="merch-info">
+                <div className="skel skel-line" style={{marginBottom:6}}></div>
+                <div className="skel skel-line short" style={{marginBottom:6}}></div>
+                <div className="skel skel-line" style={{width:'40%',height:14}}></div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -753,17 +761,36 @@ function MerchPage({member}){
 function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyShared,notify,onToggleEmail,onTogglePush,loggedIn,onLoginClick,liveMemberIds}){
   const list=members.filter(m=>oshiIds.has(m.id));
   const[copyMsg,setCopyMsg]=useState('');
+  const[shareUrl,setShareUrl]=useState('');
   const share=async()=>{
     const ids=[...oshiIds].join(',');
     const url=`${location.origin}${location.pathname}?oshi=${encodeURIComponent(ids)}`;
-    try{await navigator.clipboard.writeText(url);setCopyMsg('已複製連結！');}
-    catch{setCopyMsg(url);}
-    setTimeout(()=>setCopyMsg(''),3000);
+    try{
+      await navigator.clipboard.writeText(url);
+      setCopyMsg('已複製連結！');
+      setShareUrl('');
+      setTimeout(()=>setCopyMsg(''),3000);
+    }catch{
+      setCopyMsg('複製失敗，請手動選取連結：');
+      setShareUrl(url);
+    }
   };
   return(
     <div className="oshi-page">
       <div className="page-title">💜 {isShared?'朋友的推し':'我的推し'}</div>
       <div className="page-sub">共 {list.length} 位 · 點擊成員查看周邊商品</div>
+      {list.length>0&&(
+        <div style={{display:'flex',alignItems:'center',margin:'6px 0 10px',gap:0}}>
+          {list.slice(0,8).map((m,i)=>(
+            <div key={m.id} title={m.name||m.nameEn} style={{width:28,height:28,borderRadius:'50%',overflow:'hidden',border:'2px solid var(--bg)',marginLeft:i===0?0:-8,position:'relative',zIndex:8-i}}>
+              <Avatar member={m} size={24}/>
+            </div>
+          ))}
+          {list.length>8&&(
+            <span style={{marginLeft:8,fontSize:11,color:'var(--text2)'}}>+{list.length-8}</span>
+          )}
+        </div>
+      )}
       {!isShared&&list.length>0&&<LiveNowWidget members={members} oshiIds={oshiIds}/>}
       {isShared&&(
         <div style={{textAlign:'center',margin:'8px 0 14px'}}>
@@ -779,6 +806,13 @@ function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyS
             🔗 分享我的清單
           </button>
           {copyMsg&&<div style={{marginTop:6,fontSize:11,color:'var(--text2)'}}>{copyMsg}</div>}
+          {shareUrl&&(
+            <input
+              type="text" readOnly value={shareUrl}
+              onFocus={e=>e.target.select()}
+              style={{display:'block',margin:'8px auto 0',maxWidth:520,width:'90%',padding:'6px 10px',fontSize:11,borderRadius:8,border:'1px solid var(--card-border)',background:'var(--card-bg)',color:'var(--text)',fontFamily:'monospace'}}
+            />
+          )}
         </div>
       )}
       {!isShared&&list.length>0&&(
@@ -931,16 +965,23 @@ function LiveNowWidget({members,oshiIds}){
   );
 }
 
-function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboarding,onDismissOnboarding,loggedIn,liveMemberIds}){
+function MemberSelect({members,lastUpdated,oshiIds,onToggle,onBulkToggle,onViewOshi,showOnboarding,onDismissOnboarding,loggedIn,liveMemberIds}){
   const[search,setSearch]=useState('');
   const[branch,setBranch]=useState('all');
+  const[year,setYear]=useState('all');
   const branches=useMemo(()=>[...new Set(members.map(m=>m.branch))].sort(),[members]);
+  const years=useMemo(()=>{
+    const ys=new Set();
+    members.forEach(m=>{const y=m.debutDate?.slice(0,4);if(y) ys.add(y);});
+    return [...ys].sort((a,b)=>b.localeCompare(a));
+  },[members]);
   const filtered=useMemo(()=>{
     let l=members.filter(m=>m.active!==false);
     if(branch!=='all') l=l.filter(m=>m.branch===branch);
+    if(year!=='all') l=l.filter(m=>m.debutDate?.slice(0,4)===year);
     if(search.trim()){const q=search.trim().toLowerCase();l=l.filter(m=>m.name?.toLowerCase().includes(q)||m.nameEn?.toLowerCase().includes(q));}
     return l;
-  },[members,branch,search]);
+  },[members,branch,year,search]);
   const cnt=oshiIds.size;
   return(
     <div className="page-pad">
@@ -957,8 +998,28 @@ function MemberSelect({members,lastUpdated,oshiIds,onToggle,onViewOshi,showOnboa
         <input className="search-box" placeholder="🔍 搜尋名稱…" value={search} onChange={e=>setSearch(e.target.value)}/>
         <button className={`filter-btn ${branch==='all'?'active all':''}`} onClick={()=>setBranch('all')}>全部</button>
         {branches.map(b=><button key={b} className={`filter-btn ${branch===b?`active ${b}`:''}`} onClick={()=>setBranch(b)}>{bl(b)}</button>)}
+        <select value={year} onChange={e=>setYear(e.target.value)} aria-label="依出道年份篩選"
+          style={{background:'var(--card-bg)',border:'1px solid var(--card-border)',color:'var(--text)',padding:'5px 10px',borderRadius:14,fontSize:12,cursor:'pointer',marginLeft:6}}>
+          <option value="all">📅 全部年份</option>
+          {years.map(y=><option key={y} value={y}>{y} 年</option>)}
+        </select>
       </div>
-      <div className="result-info">找到 {filtered.length} 位{cnt>0&&<span style={{color:'var(--accent1)'}}> · 已選 {cnt} 位</span>}</div>
+      <div className="result-info" style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
+        <span>找到 {filtered.length} 位{cnt>0&&<span style={{color:'var(--accent1)'}}> · 已選 {cnt} 位</span>}</span>
+        {filtered.length>1&&onBulkToggle&&(()=>{
+          const ids=filtered.map(m=>m.id);
+          const allSelected=ids.every(id=>oshiIds.has(id));
+          return(
+            <button
+              onClick={()=>onBulkToggle(ids,allSelected?'remove':'add')}
+              style={{marginLeft:'auto',background:'transparent',border:'1px solid var(--card-border)',color:'var(--text2)',padding:'3px 10px',borderRadius:14,cursor:'pointer',fontSize:11}}
+              title={allSelected?'取消選取目前列出的全部成員':'把目前列出的成員全部加入推し'}
+            >
+              {allSelected?`✕ 取消全選（${ids.length}）`:`✓ 全選目前列出（${ids.length}）`}
+            </button>
+          );
+        })()}
+      </div>
       <div className="member-grid">
         {filtered.length===0?(
           <div className="empty" style={{gridColumn:'1/-1'}}>
@@ -1452,6 +1513,25 @@ function App(){
       sb.from('oshi_subscriptions').delete().eq('user_id',session.user.id).eq('member_id',id).then(()=>{});
     }
   },[session,isShared]);
+  // 批次選取（全選本分部用）：mode='add'|'remove'
+  const bulkToggleOshi=useCallback((ids,mode)=>{
+    if(!ids.length) return;
+    setOshiIds(prev=>{
+      const n=new Set(prev);
+      ids.forEach(id=>mode==='add'?n.add(id):n.delete(id));
+      return n;
+    });
+    if(session&&!isShared){
+      if(mode==='add'){
+        sb.from('oshi_subscriptions').upsert(
+          ids.map(id=>({user_id:session.user.id,member_id:id})),
+          {onConflict:'user_id,member_id'}
+        ).then(()=>{});
+      }else{
+        sb.from('oshi_subscriptions').delete().eq('user_id',session.user.id).in('member_id',ids).then(()=>{});
+      }
+    }
+  },[session,isShared]);
 
   // 寫入單一設定欄位
   const writeSetting=useCallback(async(field,v)=>{
@@ -1521,7 +1601,7 @@ function App(){
       {loading
         ? <div className="page-pad"><MemberSkeleton/></div>
         : <>
-          {view==='select'&&<MemberSelect members={members} lastUpdated={lastUpdated} oshiIds={oshiIds} onToggle={toggleOshi} onViewOshi={()=>setView('oshi')} showOnboarding={showOnboarding&&!isShared} onDismissOnboarding={dismissOnboarding} loggedIn={!!session} liveMemberIds={liveMemberIds}/>}
+          {view==='select'&&<MemberSelect members={members} lastUpdated={lastUpdated} oshiIds={oshiIds} onToggle={toggleOshi} onBulkToggle={bulkToggleOshi} onViewOshi={()=>setView('oshi')} showOnboarding={showOnboarding&&!isShared} onDismissOnboarding={dismissOnboarding} loggedIn={!!session} liveMemberIds={liveMemberIds}/>}
           {view==='oshi'&&<OshiPage members={members} oshiIds={oshiIds} onRemove={removeOshi} onViewMerch={m=>{setCurMember(m);setView('merch');}} onBack={()=>setView('select')} isShared={isShared} onApplyShared={applySharedToSelf} notify={notify} onToggleEmail={toggleEmail} onTogglePush={togglePush} loggedIn={!!session} onLoginClick={()=>setShowLogin(true)} liveMemberIds={liveMemberIds}/>}
           {view==='merch'&&curMember&&<MerchPage member={curMember}/>}
         </>
