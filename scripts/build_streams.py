@@ -8,6 +8,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
@@ -22,14 +23,28 @@ HOLODEX_KEY = re.sub(r"\s+", "", os.environ["HOLODEX_API_KEY"])
 UA = "nijisanji-oshi-bot/1.0 (+https://lynn25004.github.io/nijisanji-oshi/)"
 
 
-def fetch(url):
+def fetch(url, *, max_attempts=4):
     req = urllib.request.Request(url, headers={
         "X-APIKEY": HOLODEX_KEY,
         "User-Agent": UA,
         "Accept": "application/json",
     })
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.loads(r.read().decode("utf-8"))
+    last_err = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            last_err = e
+            if e.code < 500 and e.code != 429:
+                raise
+        except (urllib.error.URLError, TimeoutError) as e:
+            last_err = e
+        if attempt < max_attempts:
+            backoff = 2 ** (attempt - 1) * 3
+            print(f"[retry] {url} 第 {attempt} 次失敗（{last_err}），{backoff}s 後重試", file=sys.stderr)
+            time.sleep(backoff)
+    raise last_err
 
 
 def slim(item):
