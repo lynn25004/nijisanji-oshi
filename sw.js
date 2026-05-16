@@ -1,5 +1,5 @@
 // Service Worker：Web Push + 離線基本資源快取
-const CACHE_NAME = 'oshi-v5';
+const CACHE_NAME = 'oshi-v6';
 const CORE = [
   './',
   './index.html',
@@ -39,7 +39,23 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // 靜態資源 cache-first
+  // data/*.json 走 stale-while-revalidate：先回 cache 讓 UI 即時，再背景更新
+  if (url.pathname.includes('/data/')) {
+    e.respondWith(
+      caches.open(CACHE_NAME).then(cache =>
+        cache.match(req).then(cached => {
+          const fresh = fetch(req).then(resp => {
+            if (resp.ok) cache.put(req, resp.clone());
+            return resp;
+          }).catch(() => cached);
+          return cached || fresh;
+        })
+      )
+    );
+    return;
+  }
+
+  // 其他靜態資源 cache-first
   e.respondWith(
     caches.match(req).then(c => c || fetch(req).then(resp => {
       if (resp.ok) caches.open(CACHE_NAME).then(cc => cc.put(req, resp.clone()));

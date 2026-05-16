@@ -27,26 +27,38 @@ UA = "Mozilla/5.0 (compatible; nijisanji-oshi-bot/1.0; +https://lynn25004.github
 WORKERS = 12  # shop.nijisanji.jp 上千商品並發抓
 
 
-def fetch(url: str, timeout: int = 15):
+def fetch(url: str, timeout: int = 15, attempts: int = 1):
+    """attempts=1 表單次（單一商品失敗略過 OK）；
+    attempts>1 對 5xx / timeout 指數退避重試（sitemap 用）。"""
     req = urllib.request.Request(
         url,
         headers={"User-Agent": UA, "Accept-Language": "ja"},
     )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            if r.status != 200:
+    import time as _t
+    for i in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                if r.status != 200:
+                    return None
+                return r.read().decode("utf-8", errors="replace")
+        except urllib.error.HTTPError as e:
+            if e.code < 500 or i >= attempts:
                 return None
-            return r.read().decode("utf-8", errors="replace")
-    except Exception:
-        return None
+        except Exception:
+            if i >= attempts:
+                return None
+        _t.sleep(2 ** i)
+    return None
 
 
 def list_sitemap_codes():
     """回傳 [(code, lastmod_iso), ...]，依 sitemap 順序、去重。"""
     pairs = []
+    failures = 0
     for sm in SITEMAPS:
-        text = fetch(sm)
+        text = fetch(sm, attempts=4)  # sitemap 是關鍵入口，5xx 重試 4 次
         if not text:
+            failures += 1
             continue
         for m in re.finditer(
             r"<url>\s*<loc>https://shop\.nijisanji\.jp/([^<\s]+)\.html</loc>"
@@ -60,6 +72,9 @@ def list_sitemap_codes():
         if c not in seen:
             seen.add(c)
             uniq.append((c, lm))
+    # 全部 sitemap 都失敗 → 拒絕產出空 products.json（會覆蓋好的資料）
+    if not uniq and failures == len(SITEMAPS):
+        raise SystemExit("❌ 所有 sitemap 抓取失敗，中止 build（避免覆蓋既有資料）")
     return uniq
 
 

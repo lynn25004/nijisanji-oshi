@@ -38,17 +38,29 @@ YT_KEY = re.sub(r"\s+", "", os.environ["YOUTUBE_API_KEY"])
 UA = "nijisanji-oshi-bot/1.0 (+https://lynn25004.github.io/nijisanji-oshi/)"
 
 
-def http_get(url, headers=None):
+def http_get(url, headers=None, attempts=3):
     h = {"User-Agent": UA, "Accept": "application/json"}
     if headers:
         h.update(headers)
     req = urllib.request.Request(url, headers=h)
-    try:
-        with urllib.request.urlopen(req, timeout=30) as r:
-            return json.loads(r.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        print(f"  HTTP {e.code}: {url[:80]}", file=sys.stderr)
-        return None
+    for i in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            # 4xx 立即放棄；5xx/429 才重試
+            if e.code < 500 and e.code != 429:
+                print(f"  HTTP {e.code}: {url[:80]}", file=sys.stderr)
+                return None
+            if i >= attempts:
+                print(f"  HTTP {e.code} after {attempts} attempts: {url[:80]}", file=sys.stderr)
+                return None
+        except (urllib.error.URLError, TimeoutError) as e:
+            if i >= attempts:
+                print(f"  網路錯誤 after {attempts} attempts: {e}", file=sys.stderr)
+                return None
+        time.sleep(2 ** i)
+    return None
 
 
 def get_all_nijisanji_channels():
