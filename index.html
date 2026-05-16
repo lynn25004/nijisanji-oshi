@@ -84,8 +84,8 @@
     .filter-btn.active.VR{background:linear-gradient(135deg,#69db7c,#43a047)}
     .filters{position:sticky;top:60px;z-index:100;background:var(--bg);padding:8px 0 8px;margin:0 0 14px}
     .filter-btn:not(.active):hover{border-color:var(--accent2);color:var(--text)}
-    .member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
-    @media(max-width:480px){.member-grid{grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:7px}}
+    .member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;padding-bottom:90px}
+    @media(max-width:480px){.member-grid{grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:7px;padding-bottom:80px}}
     .member-card{background:var(--card-bg);border:2px solid var(--card-border);border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .18s,border-color .18s,background .18s,box-shadow .18s;position:relative;text-align:center;user-select:none}
     .member-card:hover{border-color:var(--accent2);transform:translateY(-2px);background:var(--card-hover);box-shadow:0 8px 24px var(--shadow)}
     .member-card.selected{border-color:var(--accent1);background:var(--selected-bg);box-shadow:0 0 0 2px rgba(255,107,157,.25),0 8px 20px rgba(255,107,157,.18);animation:pop .25s ease-out}
@@ -821,7 +821,7 @@ function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyS
           const c=m.color||hc(m.id||'x');
           return(
             <div key={m.id} className={`oshi-card ${liveMemberIds&&liveMemberIds.has(m.id)?'is-live':''}`} onClick={()=>onViewMerch(m)}>
-              <button className="remove-btn" onClick={e=>{e.stopPropagation();onRemove(m.id);}}>×</button>
+              <button className="remove-btn" aria-label={`從推し清單移除 ${m.name||m.nameEn||''}`} onClick={e=>{e.stopPropagation();onRemove(m.id);}}>×</button>
               {liveMemberIds&&liveMemberIds.has(m.id)&&<span className="live-badge">🔴 LIVE</span>}
               <div style={{width:76,height:76,borderRadius:'50%',padding:2,background:`linear-gradient(135deg,${c},${lt(c)})`}}>
                 <div style={{width:72,height:72,borderRadius:'50%',overflow:'hidden'}}><Avatar member={m} size={72}/></div>
@@ -991,6 +991,14 @@ function LoginModal({onClose}){
   const[code,setCode]=useState('');
   const[verifying,setVerifying]=useState(false);
   const[showPrivacy,setShowPrivacy]=useState(false);
+  // Esc 關閉 + 鎖背景滾動
+  useEffect(()=>{
+    const onKey=e=>{if(e.key==='Escape') onClose();};
+    const prev=document.body.style.overflow;
+    document.body.style.overflow='hidden';
+    window.addEventListener('keydown',onKey);
+    return()=>{document.body.style.overflow=prev;window.removeEventListener('keydown',onKey);};
+  },[onClose]);
   const submit=async()=>{
     if(!email.trim()) return;
     setSending(true);setErr('');
@@ -1017,7 +1025,7 @@ function LoginModal({onClose}){
     else onClose();  // 登入成功 onAuthStateChange 會處理
   };
   return(
-    <div className="modal-bd" onClick={e=>{if(e.target===e.currentTarget) onClose();}}>
+    <div className="modal-bd" role="dialog" aria-modal="true" onClick={e=>{if(e.target===e.currentTarget) onClose();}}>
       <div className="modal">
         {!sent?(
           <>
@@ -1064,7 +1072,8 @@ function LoginModal({onClose}){
               type="text" inputMode="text" autoCapitalize="off" autoCorrect="off" spellCheck={false}
               placeholder="驗證碼"
               value={code}
-              onChange={e=>setCode(e.target.value)}
+              onChange={e=>setCode(e.target.value.replace(/[\s​-‍﻿]/g,''))}
+              onPaste={e=>{e.preventDefault();const t=(e.clipboardData?.getData('text')||'').replace(/[\s​-‍﻿]/g,'');setCode(t);}}
               onKeyDown={e=>{if(e.key==='Enter') verifyCode();}}
               autoFocus
               style={{textAlign:'center',fontSize:22,letterSpacing:4,fontFamily:'monospace'}}
@@ -1157,7 +1166,7 @@ function ThemeToggle(){
     try{localStorage.setItem('niji_theme',next);}catch{}
     setTheme(next);
   };
-  return <button className="theme-btn" onClick={flip} title={theme==='dark'?'切換淺色':'切換深色'}>{theme==='dark'?'☀️':'🌙'}</button>;
+  return <button className="theme-btn" onClick={flip} title={theme==='dark'?'切換淺色':'切換深色'} aria-label={theme==='dark'?'切換淺色模式':'切換深色模式'}>{theme==='dark'?'☀️':'🌙'}</button>;
 }
 
 // ─── Onboarding banner（首次訪客顯示） ───
@@ -1173,7 +1182,7 @@ function Onboarding({onDismiss,loggedIn}){
           3️⃣ {loggedIn?'開啟通知':'登入後開啟通知'}，新品 / 直播都會主動提醒
         </div>
       </div>
-      <button className="onboarding-close" onClick={onDismiss} title="不再顯示">×</button>
+      <button className="onboarding-close" aria-label="關閉新手引導" onClick={onDismiss} title="不再顯示">×</button>
     </div>
   );
 }
