@@ -227,7 +227,7 @@
     .notify-card-title{font-size:14px;font-weight:600;color:var(--text);flex:1}
     .notify-card-sub{font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5}
     .notify-card-toggles{display:flex;gap:8px;flex-wrap:wrap}
-    .notify-pill{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--card-border);padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;transition:all .2s;user-select:none}
+    .notify-pill{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--card-border);padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;transition:all .2s;user-select:none;font-family:inherit;color:var(--text)}
     .notify-pill:hover{border-color:var(--accent2)}
     .notify-pill.on{background:var(--grad-pink);border-color:transparent;color:#fff;box-shadow:0 4px 12px rgba(255,107,157,.3)}
     .notify-pill .pill-emoji{font-size:13px}
@@ -274,7 +274,7 @@
     .explore-body{padding:0 14px 12px}
     .explore-row{margin-top:8px}
     .explore-label{font-size:11px;color:var(--text2);margin-bottom:6px}
-    .explore-pics{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+    .explore-pics{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;mask-image:linear-gradient(to right,#000 calc(100% - 24px),transparent 100%);-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 24px),transparent 100%)}
     .explore-pics::-webkit-scrollbar{height:4px}
     .explore-pics::-webkit-scrollbar-thumb{background:var(--card-border);border-radius:2px}
     .merch-sort{background:var(--card-bg);border:1px solid var(--card-border);color:var(--text);padding:6px 12px;border-radius:18px;font-size:12px;cursor:pointer;font-family:inherit;outline:none;transition:border-color .2s}
@@ -1170,19 +1170,23 @@ function AuthBar({session,onLogin,onLogout}){
 function NotifyCard({icon,title,sub,emailOn,pushOn,onToggleEmail,onTogglePush}){
   const active = emailOn || pushOn;
   return(
-    <div className={`notify-card ${active?'active':''}`}>
+    <div className={`notify-card ${active?'active':''}`} role="group" aria-label={title}>
       <div className="notify-card-hdr">
-        <span className="notify-card-icon">{icon}</span>
+        <span className="notify-card-icon" aria-hidden="true">{icon}</span>
         <span className="notify-card-title">{title}</span>
       </div>
       <div className="notify-card-sub">{sub}</div>
       <div className="notify-card-toggles">
-        <span className={`notify-pill ${emailOn?'on':''}`} onClick={()=>onToggleEmail(!emailOn)}>
-          <span className="pill-emoji">📧</span> Email {emailOn?'開':''}
-        </span>
-        <span className={`notify-pill ${pushOn?'on':''}`} onClick={()=>onTogglePush(!pushOn)}>
-          <span className="pill-emoji">🔔</span> 推播 {pushOn?'開':''}
-        </span>
+        <button type="button" className={`notify-pill ${emailOn?'on':''}`} onClick={()=>onToggleEmail(!emailOn)}
+          role="switch" aria-checked={emailOn}
+          aria-label={`Email ${title} ${emailOn?'已開啟（點擊關閉）':'已關閉（點擊開啟）'}`}>
+          <span className="pill-emoji" aria-hidden="true">📧</span> Email {emailOn?'開':''}
+        </button>
+        <button type="button" className={`notify-pill ${pushOn?'on':''}`} onClick={()=>onTogglePush(!pushOn)}
+          role="switch" aria-checked={pushOn}
+          aria-label={`瀏覽器推播 ${title} ${pushOn?'已開啟（點擊關閉）':'已關閉（點擊開啟）'}`}>
+          <span className="pill-emoji" aria-hidden="true">🔔</span> 推播 {pushOn?'開':''}
+        </button>
       </div>
     </div>
   );
@@ -1233,8 +1237,8 @@ function ThemeToggle(){
 // ─── Onboarding banner（首次訪客顯示） ───
 function Onboarding({onDismiss,loggedIn}){
   return(
-    <div className="onboarding">
-      <span className="onboarding-icon">🌈</span>
+    <div className="onboarding" role="region" aria-label="新手引導">
+      <span className="onboarding-icon" aria-hidden="true">🌈</span>
       <div className="onboarding-body">
         <div className="onboarding-title">歡迎來到推し選擇器！</div>
         <div>
