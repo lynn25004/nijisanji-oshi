@@ -1,0 +1,7 @@
+{
+  "_note": "成員生日資料；key 是 members.json 的 id；value 是 MM-DD。",
+  "lastUpdated": "2026-05-17T16:37:42.005209Z",
+  "birthdays": {
+    "mito-tsukino": "09-24"
+  }
+}

@@ -372,6 +372,17 @@ async function loadSocial(){
 // 直播資料（live + upcoming + past），存在 GitHub data branch，每 15 分鐘更新
 // 不放在 main 避免污染 git log
 const STREAMS_URL='https://raw.githubusercontent.com/lynn25004/nijisanji-oshi/data/streams.json';
+let _birthdaysCache=null;
+async function loadBirthdays(){
+  if(_birthdaysCache!==null) return _birthdaysCache;
+  try{
+    const r=await fetch('./data/birthdays.json',{cache:'force-cache'});
+    if(!r.ok){_birthdaysCache={};return _birthdaysCache;}
+    const j=await r.json();
+    _birthdaysCache=j.birthdays||{};
+    return _birthdaysCache;
+  }catch{_birthdaysCache={};return _birthdaysCache;}
+}
 let _streamsCache=null;
 async function loadStreams(force){
   if(_streamsCache && !force) return _streamsCache;
@@ -803,6 +814,8 @@ function OshiPage({members,oshiIds,onRemove,onViewMerch,onBack,isShared,onApplyS
         </div>
       )}
       {!isShared&&list.length>0&&<LiveNowWidget members={members} oshiIds={oshiIds}/>}
+      {!isShared&&list.length>0&&<BirthdayWidget members={members} oshiIds={oshiIds}/>}
+      {!isShared&&list.length>0&&<OshiActivityWidget members={members} oshiIds={oshiIds}/>}
       {isShared&&(
         <div style={{textAlign:'center',margin:'8px 0 14px'}}>
           <button onClick={onApplyShared} style={{background:'var(--accent)',border:'none',color:'#fff',padding:'8px 18px',borderRadius:20,cursor:'pointer',fontSize:13,marginRight:8}}>
@@ -972,6 +985,129 @@ function LiveNowWidget({members,oshiIds}){
           {data.upcoming.map(s=><StreamCard key={s.id} s={s} kind="upcoming" showChannel/>)}
         </div>
       )}
+    </div>
+  );
+}
+
+// 生日 widget：顯示本月、未來 30 天有生日的推し
+function BirthdayWidget({members,oshiIds}){
+  const[birthdays,setBirthdays]=useState(null);
+  useEffect(()=>{loadBirthdays().then(setBirthdays);},[]);
+
+  const data=useMemo(()=>{
+    if(!birthdays||!Object.keys(birthdays).length) return null;
+    const oshiMembers=members.filter(m=>oshiIds.has(m.id));
+    const now=new Date();
+    const mmdd=(d)=>`${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const today=mmdd(now);
+    const items=oshiMembers
+      .map(m=>{
+        const b=birthdays[m.id];
+        if(!b) return null;
+        // 算到下次生日剩幾天（跨年處理）
+        const [bm,bd]=b.split('-').map(Number);
+        if(!bm||!bd) return null;
+        let next=new Date(now.getFullYear(),bm-1,bd);
+        if(next<new Date(now.getFullYear(),now.getMonth(),now.getDate())){
+          next=new Date(now.getFullYear()+1,bm-1,bd);
+        }
+        const days=Math.round((next-now)/86400000);
+        return {member:m,bday:b,days};
+      })
+      .filter(x=>x&&x.days<=30)
+      .sort((a,b)=>a.days-b.days);
+    return items;
+  },[birthdays,members,oshiIds]);
+
+  if(!data||!data.length) return null;
+  return(
+    <div style={{margin:'0 0 14px',padding:'12px 14px',background:'linear-gradient(135deg,rgba(255,107,157,.08),rgba(199,125,255,.08))',border:'1px solid rgba(199,125,255,.25)',borderRadius:12}}>
+      <div style={{fontSize:13,fontWeight:600,marginBottom:8,color:'var(--text)'}}>
+        🎂 30 天內有生日（{data.length}）
+      </div>
+      <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+        {data.map(({member,bday,days})=>(
+          <div key={member.id} title={`${member.name} 生日 ${bday}（${days===0?'今天':`還有 ${days} 天`}）`}
+            style={{display:'flex',alignItems:'center',gap:5,background:'var(--card-bg)',border:'1px solid var(--card-border)',borderRadius:18,padding:'3px 10px 3px 3px',fontSize:11}}>
+            <div style={{width:20,height:20,borderRadius:'50%',overflow:'hidden',flexShrink:0}}>
+              <Avatar member={member} size={20}/>
+            </div>
+            <span style={{color:'var(--text)'}}>{member.name}</span>
+            <span style={{color:days===0?'#ff6b9d':'var(--text2)',fontWeight:days<=7?600:400}}>
+              {days===0?'🎉 今天':`${bday} (${days}d)`}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// 活躍度 widget：顯示「N 位推し最近 7 天沒直播」 + 各推し 30 天直播數
+function OshiActivityWidget({members,oshiIds}){
+  const[streams,setStreams]=useState(null);
+  useEffect(()=>{
+    loadStreams().then(setStreams);
+    const onRefresh=()=>loadStreams(true).then(setStreams);
+    window.addEventListener('streams-refresh',onRefresh);
+    return()=>window.removeEventListener('streams-refresh',onRefresh);
+  },[]);
+
+  const data=useMemo(()=>{
+    if(!streams) return null;
+    const oshiMembers=members.filter(m=>oshiIds.has(m.id));
+    if(!oshiMembers.length) return null;
+
+    const now=Date.now();
+    const past=streams.past||[];
+    // 算每位推し的：最後一場直播時間、近 30 天場數
+    const stats=oshiMembers.map(m=>{
+      const matched=past.filter(s=>matchChannel(s.channel,m));
+      // 取最近 end_actual or start_actual
+      let lastTs=0;
+      let count30=0;
+      for(const s of matched){
+        const t=new Date(s.end_actual||s.start_actual||s.available_at||0).getTime();
+        if(t>lastTs) lastTs=t;
+        if(now-t<=30*86400*1000) count30++;
+      }
+      const liveNow=(streams.live||[]).some(s=>matchChannel(s.channel,m)&&isActuallyLive(s));
+      const daysAgo=lastTs>0?Math.floor((now-lastTs)/86400000):null;
+      return {member:m,lastTs,daysAgo,count30,liveNow};
+    });
+
+    // 「冷凍」推し：>=7 天沒直播 + 沒在 live
+    const idle=stats
+      .filter(s=>!s.liveNow && (s.daysAgo===null || s.daysAgo>=7))
+      .sort((a,b)=>(b.daysAgo??9999)-(a.daysAgo??9999));
+
+    return {stats,idle};
+  },[streams,members,oshiIds]);
+
+  if(!data||!data.idle.length) return null;
+  return(
+    <div style={{margin:'0 0 14px',padding:'12px 14px',background:'var(--card-bg)',border:'1px solid var(--card-border)',borderRadius:12}}>
+      <div style={{fontSize:13,fontWeight:600,marginBottom:8,display:'flex',alignItems:'center',gap:6,color:'var(--text)'}}>
+        💤 <span>{data.idle.length} 位推し最近沒推送</span>
+        <span style={{fontSize:10,color:'var(--text2)',marginLeft:4,fontWeight:400}}>（≥7 天沒直播，可能在休息）</span>
+      </div>
+      <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+        {data.idle.slice(0,12).map(({member,daysAgo})=>(
+          <div key={member.id} title={`${member.name||member.nameEn} · 最後直播 ${daysAgo??'未知'} 天前`}
+            style={{display:'flex',alignItems:'center',gap:5,background:'var(--bg)',border:'1px solid var(--card-border)',borderRadius:18,padding:'3px 9px 3px 3px',fontSize:11,color:'var(--text2)'}}>
+            <div style={{width:20,height:20,borderRadius:'50%',overflow:'hidden',flexShrink:0}}>
+              <Avatar member={member} size={20}/>
+            </div>
+            <span>{member.name}</span>
+            <span style={{color:daysAgo!==null&&daysAgo>=14?'#ff9966':'var(--text3)'}}>
+              {daysAgo===null?'？':`${daysAgo}d`}
+            </span>
+          </div>
+        ))}
+        {data.idle.length>12&&(
+          <span style={{fontSize:11,color:'var(--text2)',alignSelf:'center'}}>+{data.idle.length-12}</span>
+        )}
+      </div>
     </div>
   );
 }
