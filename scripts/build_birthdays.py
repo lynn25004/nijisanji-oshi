@@ -23,15 +23,39 @@ MEMBERS_FILE = ROOT / "data" / "members.json"
 OUT_FILE = ROOT / "data" / "birthdays.json"
 
 UA = "Mozilla/5.0 (compatible; nijisanji-oshi-birthdays/1.0; +https://github.com/lynn25004/nijisanji-oshi)"
-# 主來源：wikiwiki.jp/nijisanji（每位有獨立頁面 + 統一「誕生日」table 欄位）
+# 主來源：www.nijisanji.jp 官方藝人頁（URL 跟 members.json id 一致）
+OFFICIAL_BASE = "https://www.nijisanji.jp/talents/l/"
+# 備援：wikiwiki.jp/nijisanji（每位有獨立頁面 + 統一「誕生日」table 欄位）
 WIKIWIKI_BASE = "https://wikiwiki.jp/nijisanji/"
-# 備援：ja.wikipedia.org MediaWiki API
+# 再備援：ja.wikipedia.org MediaWiki API
 WIKI_API = "https://ja.wikipedia.org/w/api.php?action=parse&format=json&prop=wikitext&page="
-WIKI_EN_API = "https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=wikitext&page="
+
+# 官方頁裡 JSON 嵌入：{"name":"誕生日","value":"9月24日"} 或 {"name":"Birthday","value":"April 25"}
+OFFICIAL_JP = re.compile(r'"(?:誕生日|生年月日)"\s*,\s*"value"\s*:\s*"(\d{1,2})\s*月\s*(\d{1,2})\s*日')
+OFFICIAL_EN = re.compile(r'"Birthday"\s*,\s*"value"\s*:\s*"(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2})')
 
 WIKIWIKI_PATTERN = re.compile(
     r"誕生日\s*</strong>\s*</td>\s*<td[^>]*>\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日"
 )
+
+MONTHS_EN_LOWER = {"january":1,"february":2,"march":3,"april":4,"may":5,"june":6,"july":7,"august":8,"september":9,"october":10,"november":11,"december":12}
+
+
+def parse_official(html):
+    if not html:
+        return None
+    m = OFFICIAL_JP.search(html)
+    if m:
+        mm, dd = int(m.group(1)), int(m.group(2))
+        if 1 <= mm <= 12 and 1 <= dd <= 31:
+            return f"{mm:02d}-{dd:02d}"
+    m = OFFICIAL_EN.search(html)
+    if m:
+        mm = MONTHS_EN_LOWER[m.group(1).lower()]
+        dd = int(m.group(2))
+        if 1 <= dd <= 31:
+            return f"{mm:02d}-{dd:02d}"
+    return None
 
 
 def fetch_html(url, attempts=3):
@@ -144,24 +168,23 @@ def main():
             continue
         bday = None
         source = None
-        # 1) wikiwiki.jp/nijisanji（主來源，每位有獨立頁面）
-        if m.get("name"):
-            url = WIKIWIKI_BASE + urllib.parse.quote(m["name"], safe="")
-            bday = parse_wikiwiki(fetch_html(url))
+        # 1) 官方 nijisanji.jp（主來源，id 直接對到 URL）
+        url = OFFICIAL_BASE + mid
+        bday = parse_official(fetch_html(url))
+        if bday:
+            source = "official"
+        # 2) wikiwiki.jp/nijisanji（備援，用日文名）
+        if not bday and m.get("name"):
+            wurl = WIKIWIKI_BASE + urllib.parse.quote(m["name"], safe="")
+            bday = parse_wikiwiki(fetch_html(wurl))
             if bday:
                 source = "wikiwiki"
-        # 2) ja.wikipedia（備援）
+        # 3) ja.wikipedia（再備援）
         if not bday and m.get("name"):
             text = fetch_wikitext(WIKI_API, m["name"])
             bday = parse_birthday(text)
             if bday:
                 source = "ja-wiki"
-        # 3) en.wikipedia（再備援）
-        if not bday and m.get("nameEn"):
-            text = fetch_wikitext(WIKI_EN_API, m["nameEn"])
-            bday = parse_birthday(text)
-            if bday:
-                source = "en-wiki"
         if bday:
             out[mid] = bday
             hit += 1
