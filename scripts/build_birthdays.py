@@ -22,10 +22,47 @@ ROOT = Path(__file__).resolve().parent.parent
 MEMBERS_FILE = ROOT / "data" / "members.json"
 OUT_FILE = ROOT / "data" / "birthdays.json"
 
-UA = "nijisanji-oshi-birthdays/1.0 (+https://github.com/lynn25004/nijisanji-oshi)"
-# ja.wikipedia.org MediaWiki API（raw wikitext，公開無 cloudflare）
+UA = "Mozilla/5.0 (compatible; nijisanji-oshi-birthdays/1.0; +https://github.com/lynn25004/nijisanji-oshi)"
+# 主來源：wikiwiki.jp/nijisanji（每位有獨立頁面 + 統一「誕生日」table 欄位）
+WIKIWIKI_BASE = "https://wikiwiki.jp/nijisanji/"
+# 備援：ja.wikipedia.org MediaWiki API
 WIKI_API = "https://ja.wikipedia.org/w/api.php?action=parse&format=json&prop=wikitext&page="
 WIKI_EN_API = "https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=wikitext&page="
+
+WIKIWIKI_PATTERN = re.compile(
+    r"誕生日\s*</strong>\s*</td>\s*<td[^>]*>\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日"
+)
+
+
+def fetch_html(url, attempts=3):
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    for i in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=20) as r:
+                return r.read().decode("utf-8", errors="replace")
+        except urllib.error.HTTPError as e:
+            if e.code in (400, 404):
+                return None
+            if i >= attempts:
+                return None
+        except Exception:
+            if i >= attempts:
+                return None
+        time.sleep(2 ** i)
+    return None
+
+
+def parse_wikiwiki(html):
+    if not html:
+        return None
+    m = WIKIWIKI_PATTERN.search(html)
+    if not m:
+        return None
+    mm = int(m.group(1))
+    dd = int(m.group(2))
+    if 1 <= mm <= 12 and 1 <= dd <= 31:
+        return f"{mm:02d}-{dd:02d}"
+    return None
 
 
 def fetch_wikitext(api_url, title, attempts=3):
@@ -106,22 +143,33 @@ def main():
         if not mid or mid in out:
             continue
         bday = None
-        # 1) 日文 wiki 用日文名
+        source = None
+        # 1) wikiwiki.jp/nijisanji（主來源，每位有獨立頁面）
         if m.get("name"):
+            url = WIKIWIKI_BASE + urllib.parse.quote(m["name"], safe="")
+            bday = parse_wikiwiki(fetch_html(url))
+            if bday:
+                source = "wikiwiki"
+        # 2) ja.wikipedia（備援）
+        if not bday and m.get("name"):
             text = fetch_wikitext(WIKI_API, m["name"])
             bday = parse_birthday(text)
-        # 2) 英文 wiki 用英文名 (fallback)
+            if bday:
+                source = "ja-wiki"
+        # 3) en.wikipedia（再備援）
         if not bday and m.get("nameEn"):
             text = fetch_wikitext(WIKI_EN_API, m["nameEn"])
             bday = parse_birthday(text)
+            if bday:
+                source = "en-wiki"
         if bday:
             out[mid] = bday
             hit += 1
-            print(f"  ✅ {mid} ({m.get('name')}) → {bday}", flush=True)
+            print(f"  ✅ {mid} ({m.get('name')}) → {bday} [{source}]", flush=True)
         else:
             miss += 1
             print(f"  ❌ {mid} ({m.get('name')})", flush=True)
-        time.sleep(0.3)  # 對 wikipedia 客氣
+        time.sleep(0.4)
         if i % 10 == 0:
             print(f"-- 進度 {i}/{len(members)} (命中 {hit} / 漏 {miss}) --", flush=True)
 
