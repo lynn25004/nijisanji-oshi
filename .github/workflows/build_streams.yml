@@ -27,6 +27,8 @@ jobs:
           HOLODEX_API_KEY: ${{ secrets.HOLODEX_API_KEY }}
         run: python -u scripts/build_streams.py
       - name: 推 streams.json 到 data branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
           cp data/streams.json /tmp/streams.json
@@ -39,4 +41,4 @@ jobs:
           git add streams.json
           git diff --staged --quiet && echo "no change, skip" && exit 0
           git commit -m "更新直播資料 $(date -u +%Y-%m-%dT%H:%MZ)"
-          git push origin HEAD:data
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:data
