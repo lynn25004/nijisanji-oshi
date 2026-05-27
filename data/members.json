@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-05-26",
+  "lastUpdated": "2026-05-27",
   "members": [
     {
       "id": "mito-tsukino",
@@ -1520,23 +1520,23 @@
       "channelUrl": ""
     },
     {
-      "id": "rika-igarashi",
-      "name": "五十嵐梨花",
-      "nameEn": "Igarashi Rika",
-      "branch": "JP",
-      "debutDate": "2023-01-15",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/a5dc528f536b4c7eaf06fadca75013d8/liver-face_Rika_Igarashi.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "akari-shishido",
       "name": "獅子堂あかり",
       "nameEn": "Shishido Akari",
       "branch": "JP",
       "debutDate": "2023-01-15",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/e44d14200fec437eb35361aab7e29e76/liver-face_Akari_Shishido.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "rika-igarashi",
+      "name": "五十嵐梨花",
+      "nameEn": "Igarashi Rika",
+      "branch": "JP",
+      "debutDate": "2023-01-15",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/8a2202a4476b4ea3822b2b287f7daea0/liver-face_Rika_Igarashi.png",
       "active": true,
       "color": "",
       "channelUrl": ""
