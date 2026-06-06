@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-06-03",
+  "lastUpdated": "2026-06-06",
   "members": [
     {
       "id": "mito-tsukino",
@@ -2092,23 +2092,23 @@
       "channelUrl": ""
     },
     {
-      "id": "daichi-tsukahara",
-      "name": "塚原大地",
-      "nameEn": "Tsukahara Daichi",
-      "branch": "JP",
-      "debutDate": "2026-04-18",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/076a419e60b243f484fdb1f076dae6d3/liver-face_Daichi_Tsukahara.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "onotora",
       "name": "男虎",
       "nameEn": "Onotora",
       "branch": "JP",
       "debutDate": "2026-04-18",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/9b5cbb18f0eb42af9f738683d7551cfa/liver-face_Onotora.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "daichi-tsukahara",
+      "name": "塚原大地",
+      "nameEn": "Tsukahara Daichi",
+      "branch": "JP",
+      "debutDate": "2026-04-18",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/076a419e60b243f484fdb1f076dae6d3/liver-face_Daichi_Tsukahara.png",
       "active": true,
       "color": "",
       "channelUrl": ""
