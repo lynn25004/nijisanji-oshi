@@ -383,17 +383,62 @@ async function loadBirthdays(){
     return _birthdaysCache;
   }catch{_birthdaysCache={};return _birthdaysCache;}
 }
+// 唯讀 Holodex API key：前端即時查直播狀態用，繞過 GitHub Actions 管線的數分鐘延遲。
+// （與後端管線同一把；若需停用，到 Holodex 後台重新產生並更新 GitHub secret 即可）
+const HOLODEX_KEY='43096785-5143-4e89-99e5-51714d15f406';
+const HOLODEX_LIVE_URL='https://holodex.net/api/v2/live?org=Nijisanji&type=stream&limit=200';
+
+// 把 Holodex 原始資料砍成跟 streams.json 同樣的精簡格式
+function slimHolodex(item){
+  const ch=item.channel||{};
+  return {
+    id:item.id,title:item.title,status:item.status,
+    available_at:item.available_at,start_scheduled:item.start_scheduled,
+    start_actual:item.start_actual,end_actual:item.end_actual,
+    duration:item.duration||0,live_viewers:item.live_viewers||0,
+    topic_id:item.topic_id,
+    channel:{id:ch.id,name:ch.name,english_name:ch.english_name},
+  };
+}
+
+// 直接向 Holodex 拿「現在 live + 即將開播」，零管線延遲、狀態最準
+async function fetchHolodexLive(){
+  if(!HOLODEX_KEY||HOLODEX_KEY.indexOf('__')===0) return null;  // 沒填 key 就跳過
+  try{
+    const r=await fetch(HOLODEX_LIVE_URL,{headers:{'X-APIKEY':HOLODEX_KEY},cache:'no-store'});
+    if(!r.ok) return null;
+    const arr=await r.json();
+    if(!Array.isArray(arr)) return null;
+    const live=[],upcoming=[];
+    for(const it of arr){
+      const s=slimHolodex(it);
+      if(it.status==='live'){ if(isActuallyLive(s)) live.push(s); }
+      else if(it.status==='upcoming'){ upcoming.push(s); }
+    }
+    live.sort((a,b)=>(b.start_actual||'').localeCompare(a.start_actual||''));
+    upcoming.sort((a,b)=>(a.start_scheduled||'').localeCompare(b.start_scheduled||''));
+    return {live,upcoming};
+  }catch{return null;}
+}
+
 let _streamsCache=null;
 async function loadStreams(force){
   if(_streamsCache && !force) return _streamsCache;
+  // 1) 先拿預建 streams.json（past 清單 + Holodex 拿不到時的後援）
+  let base=_streamsCache;
   try{
-    // force 模式或預設：每次都加新 timestamp 強制 refetch
     const t=force?Date.now():Math.floor(Date.now()/60000);  // 1 分鐘粒度
     const r=await fetch(`${STREAMS_URL}?t=${t}`,{cache:'no-cache'});
-    if(!r.ok) return _streamsCache;  // 失敗回前次值
-    _streamsCache=await r.json();
-    return _streamsCache;
-  }catch{return _streamsCache;}
+    if(r.ok) base=await r.json();
+  }catch{}
+  base=base||{live:[],upcoming:[],past:[]};
+  // 2) 再用 Holodex 即時資料覆蓋 live / upcoming（拿不到就沿用預建）
+  const fresh=await fetchHolodexLive();
+  if(fresh){
+    base=Object.assign({},base,{live:fresh.live,upcoming:fresh.upcoming,_liveSource:'holodex',lastUpdated:new Date().toISOString()});
+  }
+  _streamsCache=base;
+  return _streamsCache;
 }
 
 // 全域：回到 tab 或 PWA 重新顯示時，自動 refetch streams
@@ -404,6 +449,12 @@ if(typeof document!=='undefined'){
       window.dispatchEvent(new CustomEvent('streams-refresh'));
     }
   });
+  // 前景時每 90 秒自動刷新直播狀態，維持近即時
+  setInterval(()=>{
+    if(document.visibilityState==='visible'){
+      loadStreams(true).then(()=>window.dispatchEvent(new CustomEvent('streams-refresh')));
+    }
+  },90000);
 }
 
 // 過濾『假 live』：已結束 / 太久沒更新 / 已有 duration
