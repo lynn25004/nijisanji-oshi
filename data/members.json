@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-06-20",
+  "lastUpdated": "2026-06-21",
   "members": [
     {
       "id": "mito-tsukino",
@@ -1388,23 +1388,23 @@
       "channelUrl": ""
     },
     {
-      "id": "seraph-dazzlegarden",
-      "name": "セラフ・ダズルガーデン",
-      "nameEn": "Seraph Dazzlegarden",
-      "branch": "JP",
-      "debutDate": "2022-07-12",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/42fb181000564635aab64bb7cbedb886/liver-face_Seraph_Dazzlegarden.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "kanato-fura",
       "name": "風楽奏斗",
       "nameEn": "Fura Kanato",
       "branch": "JP",
       "debutDate": "2022-07-12",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/b0151287da7d40e4b3d80ce499838785/liver-face_Kanato_Fura.png.webp",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "seraph-dazzlegarden",
+      "name": "セラフ・ダズルガーデン",
+      "nameEn": "Seraph Dazzlegarden",
+      "branch": "JP",
+      "debutDate": "2022-07-12",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/42fb181000564635aab64bb7cbedb886/liver-face_Seraph_Dazzlegarden.png.webp",
       "active": true,
       "color": "",
       "channelUrl": ""
