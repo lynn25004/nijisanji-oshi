@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-06-26",
+  "lastUpdated": "2026-06-27",
   "members": [
     {
       "id": "mito-tsukino",
@@ -1850,23 +1850,23 @@
       "channelUrl": ""
     },
     {
-      "id": "berry-saotome",
-      "name": "早乙女ベリー",
-      "nameEn": "Saotome Berry",
-      "branch": "JP",
-      "debutDate": "2024-08-12",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/712d2034f4d24f29ae34ffaf8b55f46a/liver-face_Berry_Saotome.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "trout-nagisa",
       "name": "渚トラウト",
       "nameEn": "Nagisa Trout",
       "branch": "JP",
       "debutDate": "2024-08-12",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/03ab673bb8c0400a9fdce1f51755a7e7/liver-face_Trout_Nagisa.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "berry-saotome",
+      "name": "早乙女ベリー",
+      "nameEn": "Saotome Berry",
+      "branch": "JP",
+      "debutDate": "2024-08-12",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/712d2034f4d24f29ae34ffaf8b55f46a/liver-face_Berry_Saotome.png",
       "active": true,
       "color": "",
       "channelUrl": ""
