@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-06-29T09:59:40+00:00",
+  "lastUpdated": "2026-07-06T09:11:00+00:00",
   "social": {
     "mito-tsukino": {
       "youtube": "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A",
@@ -236,14 +236,14 @@
       "twitter": "https://x.com/KataribeTsumugu",
       "twitch": null
     },
-    "lize-helesta": {
-      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
-      "twitter": "https://x.com/Lize_Helesta",
-      "twitch": null
-    },
     "ange-katrina": {
       "youtube": "https://www.youtube.com/channel/UCHVXbQzkl3rDfsXWo8xi2qw",
       "twitter": "https://x.com/ange_katrina_",
+      "twitch": null
+    },
+    "lize-helesta": {
+      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
+      "twitter": "https://x.com/Lize_Helesta",
       "twitch": null
     },
     "toko-inui": {
@@ -573,7 +573,7 @@
     },
     "luca-kaneshiro": {
       "youtube": "https://www.youtube.com/channel/UC7Gb7Uawe20QyFibhLl1lzA",
-      "twitter": "https://x.com/Nypooog",
+      "twitter": "https://x.com/bbunyii",
       "twitch": null
     },
     "shu-yamino": {
@@ -754,7 +754,7 @@
     "yu-q-wilson": {
       "youtube": "https://www.youtube.com/channel/UCKpKC3M5fkcEvtOr06dmYlA",
       "twitter": "https://x.com/YuQWilson",
-      "twitch": null
+      "twitch": "https://twitch.tv/yu_q_wilson"
     },
     "vezalius-bandage": {
       "youtube": "https://www.youtube.com/channel/UCK9l6rTwU3hiSZijIMq51Gw",
@@ -768,7 +768,7 @@
     },
     "ruri-shioriha": {
       "youtube": "https://www.youtube.com/channel/UC7_MFM9b8hp5kuTSpa8WyOQ",
-      "twitter": null,
+      "twitter": "https://x.com/Ruri_4ori8",
       "twitch": null
     },
     "milan-kestrel": {
@@ -946,15 +946,15 @@
       "twitter": "https://x.com/Rei7_2434",
       "twitch": "https://twitch.tv/rei7_2434"
     },
-    "onotora": {
-      "youtube": "https://www.youtube.com/channel/UCFimqykDM5g9a5KxlW_e7ZQ",
-      "twitter": "https://x.com/OnoTora333",
-      "twitch": "https://twitch.tv/onotora_2434"
-    },
     "ayumu-senri": {
       "youtube": "https://www.youtube.com/channel/UC5Qv2tPOI38OcnqOdUKkn7Q",
       "twitter": "https://x.com/Senri_Ayumu",
       "twitch": "https://twitch.tv/senriayumu_2434"
+    },
+    "onotora": {
+      "youtube": "https://www.youtube.com/channel/UCFimqykDM5g9a5KxlW_e7ZQ",
+      "twitter": "https://x.com/OnoTora333",
+      "twitch": "https://twitch.tv/onotora_2434"
     },
     "daichi-tsukahara": {
       "youtube": "https://www.youtube.com/channel/UC9HYkiQZ1_b3J_F8gc12eaA",
