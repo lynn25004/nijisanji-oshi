@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-07-07",
+  "lastUpdated": "2026-07-08",
   "members": [
     {
       "id": "mito-tsukino",
@@ -409,23 +409,23 @@
       "channelUrl": ""
     },
     {
-      "id": "debidebi-debiru",
-      "name": "でびでび・でびる",
-      "nameEn": "Debidebi Debiru",
-      "branch": "JP",
-      "debutDate": "2018-08-30",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/04f4ba87b763413da8836997ae3cd4c7/liver-face_Debidebi_Debiru.png.webp",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "joe-rikiichi",
       "name": "ジョー・力一",
       "nameEn": "Joe Rikiichi",
       "branch": "JP",
       "debutDate": "2018-08-30",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/4a3b9b71b6574bed8b6d5c08840ecdbe/liver-face_Joe_Rikiichi.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "debidebi-debiru",
+      "name": "でびでび・でびる",
+      "nameEn": "Debidebi Debiru",
+      "branch": "JP",
+      "debutDate": "2018-08-30",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/04f4ba87b763413da8836997ae3cd4c7/liver-face_Debidebi_Debiru.png.webp",
       "active": true,
       "color": "",
       "channelUrl": ""
