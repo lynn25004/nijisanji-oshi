@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-07-11",
+  "lastUpdated": "2026-07-12",
   "members": [
     {
       "id": "mito-tsukino",
@@ -2092,23 +2092,23 @@
       "channelUrl": ""
     },
     {
-      "id": "ayumu-senri",
-      "name": "千凛あゆむ",
-      "nameEn": "Senri Ayumu",
-      "branch": "JP",
-      "debutDate": "2026-04-18",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/e44c5e13ac324cd3a1b43196739bea2f/liver-face_Ayumu_Senri.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "onotora",
       "name": "男虎",
       "nameEn": "Onotora",
       "branch": "JP",
       "debutDate": "2026-04-18",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/9b5cbb18f0eb42af9f738683d7551cfa/liver-face_Onotora.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "ayumu-senri",
+      "name": "千凛あゆむ",
+      "nameEn": "Senri Ayumu",
+      "branch": "JP",
+      "debutDate": "2026-04-18",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/e44c5e13ac324cd3a1b43196739bea2f/liver-face_Ayumu_Senri.png",
       "active": true,
       "color": "",
       "channelUrl": ""
