@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-07-13T08:26:33+00:00",
+  "lastUpdated": "2026-07-20T08:17:02+00:00",
   "social": {
     "mito-tsukino": {
       "youtube": "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A",
@@ -78,7 +78,7 @@
     },
     "kanae": {
       "youtube": "https://www.youtube.com/channel/UCspv01oxUFf_MTSipURRhkA",
-      "twitter": null,
+      "twitter": "https://x.com/Kanae_2434",
       "twitch": null
     },
     "youko-akabane": {
@@ -148,7 +148,7 @@
     },
     "yuika-shiina": {
       "youtube": "https://www.youtube.com/channel/UC_4tXjqecqox5Uc05ncxpxg",
-      "twitter": "https://x.com/yuika_siina",
+      "twitter": null,
       "twitch": null
     },
     "makaino-ririmu": {
@@ -236,14 +236,14 @@
       "twitter": "https://x.com/KataribeTsumugu",
       "twitch": null
     },
-    "lize-helesta": {
-      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
-      "twitter": "https://x.com/Lize_Helesta",
-      "twitch": null
-    },
     "ange-katrina": {
       "youtube": "https://www.youtube.com/channel/UCHVXbQzkl3rDfsXWo8xi2qw",
       "twitter": "https://x.com/ange_katrina_",
+      "twitch": null
+    },
+    "lize-helesta": {
+      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
+      "twitter": "https://x.com/Lize_Helesta",
       "twitch": null
     },
     "toko-inui": {
@@ -434,12 +434,12 @@
     "tojiro-genzuki": {
       "youtube": "https://www.youtube.com/channel/UCGw7lrT-rVZCWHfdG9Frcgg",
       "twitter": "https://x.com/1O46V",
-      "twitch": null
+      "twitch": "https://twitch.tv/genzuki_tojiro"
     },
     "so-nagi": {
       "youtube": "https://www.youtube.com/channel/UC5ek2GWKvUKFgnKSHuuCFrw",
       "twitter": "https://x.com/NagiSo2434",
-      "twitch": null
+      "twitch": "https://twitch.tv/lr7llr7l"
     },
     "kirame-sorahoshi": {
       "youtube": "https://www.youtube.com/channel/UC_82HBGtvwN1hcGeOGHzUBQ",
@@ -638,7 +638,7 @@
     },
     "ren-zotto": {
       "youtube": "https://www.youtube.com/channel/UCKu59gTZ_rdEmerdx5rV4Yg",
-      "twitter": "https://x.com/RenZott0",
+      "twitter": "https://x.com/renzott0",
       "twitch": null
     },
     "maria-marionette": {
