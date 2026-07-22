@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-07-21",
+  "lastUpdated": "2026-07-22",
   "members": [
     {
       "id": "mito-tsukino",
@@ -1850,23 +1850,23 @@
       "channelUrl": ""
     },
     {
-      "id": "trout-nagisa",
-      "name": "渚トラウト",
-      "nameEn": "Nagisa Trout",
-      "branch": "JP",
-      "debutDate": "2024-08-12",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/03ab673bb8c0400a9fdce1f51755a7e7/liver-face_Trout_Nagisa.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "berry-saotome",
       "name": "早乙女ベリー",
       "nameEn": "Saotome Berry",
       "branch": "JP",
       "debutDate": "2024-08-12",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/712d2034f4d24f29ae34ffaf8b55f46a/liver-face_Berry_Saotome.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "trout-nagisa",
+      "name": "渚トラウト",
+      "nameEn": "Nagisa Trout",
+      "branch": "JP",
+      "debutDate": "2024-08-12",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/03ab673bb8c0400a9fdce1f51755a7e7/liver-face_Trout_Nagisa.png",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -2156,6 +2156,24 @@
       "active": true,
       "color": "",
       "channelUrl": ""
+    },
+    {
+      "id": "pomelo-punch",
+      "name": "ぽめろ・ぱんち",
+      "nameEn": "Pomelo Punch",
+      "branch": "JP",
+      "debutDate": "2026-07-20",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/142fe456d0f84480bbe94bc25e34fc18/liver-face_Pomelo_Punch.png",
+      "active": true
+    },
+    {
+      "id": "purin-lala-mode",
+      "name": "ぷりん・らら・もーど",
+      "nameEn": "Purin Lala Mode",
+      "branch": "JP",
+      "debutDate": "2026-07-20",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/21b383b80a554ca7bff591a61c0b4433/liver-face_Purin_Lala_Mode.png",
+      "active": true
     }
   ]
 }
