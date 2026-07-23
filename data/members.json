@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-07-22",
+  "lastUpdated": "2026-07-23",
   "members": [
     {
       "id": "mito-tsukino",
@@ -964,7 +964,7 @@
       "nameEn": "Genzuki Tojiro",
       "branch": "JP",
       "debutDate": "2020-04-01",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/ee4d153e3ebd4dc8aa7a2d1af6b65a3e/liver-face_Tojiro_Genzuki.png",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/e0e38f8ea5df43df9e667780914966dc/liver-face_Tojiro_Genzuki.png",
       "active": true,
       "color": "",
       "channelUrl": ""
@@ -2164,7 +2164,9 @@
       "branch": "JP",
       "debutDate": "2026-07-20",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/142fe456d0f84480bbe94bc25e34fc18/liver-face_Pomelo_Punch.png",
-      "active": true
+      "active": true,
+      "color": "",
+      "channelUrl": ""
     },
     {
       "id": "purin-lala-mode",
@@ -2173,7 +2175,9 @@
       "branch": "JP",
       "debutDate": "2026-07-20",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/21b383b80a554ca7bff591a61c0b4433/liver-face_Purin_Lala_Mode.png",
-      "active": true
+      "active": true,
+      "color": "",
+      "channelUrl": ""
     }
   ]
 }
