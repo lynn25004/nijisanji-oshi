@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-07-23",
+  "lastUpdated": "2026-07-24",
   "members": [
     {
       "id": "mito-tsukino",
@@ -2158,23 +2158,23 @@
       "channelUrl": ""
     },
     {
-      "id": "pomelo-punch",
-      "name": "ぽめろ・ぱんち",
-      "nameEn": "Pomelo Punch",
-      "branch": "JP",
-      "debutDate": "2026-07-20",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/142fe456d0f84480bbe94bc25e34fc18/liver-face_Pomelo_Punch.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "purin-lala-mode",
       "name": "ぷりん・らら・もーど",
       "nameEn": "Purin Lala Mode",
       "branch": "JP",
       "debutDate": "2026-07-20",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/21b383b80a554ca7bff591a61c0b4433/liver-face_Purin_Lala_Mode.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "pomelo-punch",
+      "name": "ぽめろ・ぱんち",
+      "nameEn": "Pomelo Punch",
+      "branch": "JP",
+      "debutDate": "2026-07-20",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/142fe456d0f84480bbe94bc25e34fc18/liver-face_Pomelo_Punch.png",
       "active": true,
       "color": "",
       "channelUrl": ""
