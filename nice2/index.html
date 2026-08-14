@@ -1,4 +1,17 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NiCE2 攤位速查</title>
+<meta name="description" content="NiCE2 創・迴響 2（8/15 南港展覽館一館）全部 2546 攤速查：官方社團名單＋各社團宣傳文，可依攤位號、社團名、作品、商品類型搜尋。">
+<meta name="theme-color" content="#161A22">
+<meta property="og:type" content="website">
+<meta property="og:title" content="NiCE2 攤位速查">
+<meta property="og:description" content="NiCE2 創・迴響 2（8/15 南港展覽館一館）全部 2546 攤速查：官方社團名單＋各社團宣傳文，可依攤位號、社團名、作品、商品類型搜尋。">
+<meta property="og:url" content="https://lynn25004.github.io/nijisanji-oshi/nice2/">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary">
 <style>
   :root {
     --ground:#F1F2F5; --surface:#FFFFFF; --ink:#161A22; --muted:#5B6272;
@@ -53,7 +66,8 @@
   .zone-head h2 { font-family:var(--font-display); font-size:21px; font-weight:700; margin:0; letter-spacing:.02em; }
   .zone-head span { font-family:var(--font-mono); font-size:11.5px; letter-spacing:.12em;
                     text-transform:uppercase; color:var(--muted); }
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(288px,1fr)); gap:12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(288px,100%),1fr)); gap:12px; }
+  .grid > * { min-width:0; }
   .card { background:var(--surface); border:1px solid var(--line-soft); border-radius:2px;
           padding:14px 16px 16px; display:flex; flex-direction:column; gap:8px; position:relative;
           transition:border-color .12s, box-shadow .12s; }
@@ -69,21 +83,25 @@
            background:var(--ink); color:var(--surface); }
   .zodiac .plate { background:transparent; color:var(--ink); box-shadow:inset 0 0 0 2px var(--ink); }
   .biz .plate, .special .plate { background:var(--deep); color:var(--surface); }
-  .cname { font-family:var(--font-display); font-size:16px; font-weight:700; line-height:1.4; margin:0; padding-top:2px; }
+  .cname { font-family:var(--font-display); font-size:16px; font-weight:700; line-height:1.4;
+           margin:0; padding-top:2px; overflow-wrap:anywhere; min-width:0; }
   .new { font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em; color:var(--accent);
          border:1px solid var(--accent); padding:1px 5px; margin-top:4px; }
-  .body { margin:0; white-space:pre-wrap; font-size:14px; color:var(--muted); }
+  .body { margin:0; white-space:pre-wrap; font-size:14px; color:var(--muted);
+          overflow-wrap:anywhere; word-break:break-word; }
   .tags { display:flex; flex-wrap:wrap; gap:5px; }
   .tag { font-size:11.5px; line-height:1.5; letter-spacing:.04em; color:var(--accent);
          background:var(--accent-tint); padding:2px 7px; white-space:nowrap; }
   .cat { font-size:11.5px; line-height:1.5; letter-spacing:.04em; color:var(--muted);
          border:1px solid var(--line); padding:1px 7px; white-space:nowrap; }
   select { font-family:var(--font-body); font-size:13px; color:var(--ink); background:var(--surface);
-           border:1px solid var(--line); border-radius:2px; padding:7px 9px; max-width:46vw; }
+           border:1px solid var(--line); border-radius:2px; padding:7px 9px;
+           max-width:100%; min-width:0; flex:0 1 auto; }
   select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
   .links { display:flex; flex-wrap:wrap; gap:12px; margin-top:2px; }
   .links a { font-family:var(--font-mono); font-size:11.5px; letter-spacing:.06em;
-             color:var(--muted); text-decoration:none; border-bottom:1px solid var(--line); }
+             color:var(--muted); text-decoration:none; border-bottom:1px solid var(--line);
+             overflow-wrap:anywhere; }
   .links a:hover { color:var(--accent); border-color:var(--accent); }
   .empty { padding:40px 4px; color:var(--muted); font-family:var(--font-mono); font-size:13px; }
   .empty[hidden] { display:none; }
@@ -95,6 +113,8 @@
   footer a:hover { color:var(--accent); }
   @media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }
 </style>
+</head>
+<body>
 <div class="wrap">
   <header>
     <div class="eyebrow">
@@ -107,7 +127,7 @@
       搜尋攤位號、社團名或作品名即可定位；點卡片開該社團的宣傳頁。</p>
     <div class="notice">
       <b>全部 2546 攤</b>，其中 <b>1431 攤</b>找得到宣傳文（用「有宣傳文」篩選）。
-      每 15 分鐘自動更新，最後更新：2026/8/14 21:20:32
+      每 15 分鐘自動更新，最後更新：2026/8/14 21:24:07
     </div>
   </header>
 
@@ -240,3 +260,5 @@ function apply() {
 qEl.addEventListener("input", apply);
 apply();
 </script>
+</body>
+</html>
