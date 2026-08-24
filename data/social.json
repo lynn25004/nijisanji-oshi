@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-17T05:44:43+00:00",
+  "lastUpdated": "2026-08-24T05:48:19+00:00",
   "social": {
     "mito-tsukino": {
       "youtube": "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A",
@@ -241,14 +241,14 @@
       "twitter": "https://x.com/ange_katrina_",
       "twitch": null
     },
-    "lize-helesta": {
-      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
-      "twitter": "https://x.com/Lize_Helesta",
-      "twitch": null
-    },
     "toko-inui": {
       "youtube": "https://www.youtube.com/channel/UCXRlIK3Cw_TJIQC5kSJJQMg",
       "twitter": "https://x.com/inui_toko",
+      "twitch": null
+    },
+    "lize-helesta": {
+      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
+      "twitter": "https://x.com/Lize_Helesta",
       "twitch": null
     },
     "akina-saegusa": {
@@ -314,7 +314,7 @@
     "kokoro-amamiya": {
       "youtube": "https://www.youtube.com/channel/UCkIimWZ9gBJRamKF0rmPU8w",
       "twitter": "https://x.com/amamiya_kokoro",
-      "twitch": null
+      "twitch": "https://twitch.tv/amamiyakokoro_"
     },
     "ratna-petit": {
       "youtube": "https://www.youtube.com/channel/UCIG9rDtgR45VCZmYnd-4DUw",
@@ -946,15 +946,15 @@
       "twitter": "https://x.com/Rei7_2434",
       "twitch": "https://twitch.tv/rei7_2434"
     },
-    "ayumu-senri": {
-      "youtube": "https://www.youtube.com/channel/UC5Qv2tPOI38OcnqOdUKkn7Q",
-      "twitter": "https://x.com/Senri_Ayumu",
-      "twitch": "https://twitch.tv/senriayumu_2434"
-    },
     "onotora": {
       "youtube": "https://www.youtube.com/channel/UCFimqykDM5g9a5KxlW_e7ZQ",
       "twitter": "https://x.com/OnoTora333",
       "twitch": "https://twitch.tv/onotora_2434"
+    },
+    "ayumu-senri": {
+      "youtube": "https://www.youtube.com/channel/UC5Qv2tPOI38OcnqOdUKkn7Q",
+      "twitter": "https://x.com/Senri_Ayumu",
+      "twitch": "https://twitch.tv/senriayumu_2434"
     },
     "daichi-tsukahara": {
       "youtube": "https://www.youtube.com/channel/UC9HYkiQZ1_b3J_F8gc12eaA",
