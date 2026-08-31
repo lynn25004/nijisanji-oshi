@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-08-24T05:48:19+00:00",
+  "lastUpdated": "2026-08-31T11:35:22+00:00",
   "social": {
     "mito-tsukino": {
       "youtube": "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A",
@@ -754,7 +754,7 @@
     "yu-q-wilson": {
       "youtube": "https://www.youtube.com/channel/UCKpKC3M5fkcEvtOr06dmYlA",
       "twitter": "https://x.com/YuQWilson",
-      "twitch": null
+      "twitch": "https://twitch.tv/yu_q_wilson"
     },
     "vezalius-bandage": {
       "youtube": "https://www.youtube.com/channel/UCK9l6rTwU3hiSZijIMq51Gw",
@@ -836,14 +836,14 @@
       "twitter": "https://x.com/Suzuna_Nanase",
       "twitch": null
     },
-    "berry-saotome": {
-      "youtube": "https://www.youtube.com/channel/UC0xry7czPasj1wPxR8L0MZg",
-      "twitter": "https://x.com/Saotome_Berry",
-      "twitch": null
-    },
     "trout-nagisa": {
       "youtube": "https://www.youtube.com/channel/UCpjypWF_wNRs9_TrjjWngpQ",
       "twitter": "https://x.com/Tr0uT_2434",
+      "twitch": null
+    },
+    "berry-saotome": {
+      "youtube": "https://www.youtube.com/channel/UC0xry7czPasj1wPxR8L0MZg",
+      "twitter": "https://x.com/Saotome_Berry",
       "twitch": null
     },
     "soma-sakayori": {
@@ -984,6 +984,16 @@
     "pomelo-punch": {
       "youtube": "https://www.youtube.com/channel/UCa1HO5wU6csVDePt9EPYqmA",
       "twitter": "https://x.com/Punch_Pomelo",
+      "twitch": null
+    },
+    "taiga-kaminaga": {
+      "youtube": "https://www.youtube.com/channel/UCxTIuegV_Vqx11ctdeezPRQ",
+      "twitter": "https://x.com/Taiga_Kaminaga",
+      "twitch": null
+    },
+    "ryuichiro-yamada": {
+      "youtube": "https://www.youtube.com/channel/UCzHiiP2r1zyTr8A1-6HtQtw",
+      "twitter": "https://x.com/Ryuichiro_YMD",
       "twitch": null
     }
   }
