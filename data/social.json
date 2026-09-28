@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-09-21T10:39:47+00:00",
+  "lastUpdated": "2026-09-28T11:41:09+00:00",
   "social": {
     "mito-tsukino": {
       "youtube": "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A",
@@ -236,14 +236,14 @@
       "twitter": "https://x.com/KataribeTsumugu",
       "twitch": null
     },
-    "lize-helesta": {
-      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
-      "twitter": "https://x.com/Lize_Helesta",
-      "twitch": null
-    },
     "ange-katrina": {
       "youtube": "https://www.youtube.com/channel/UCHVXbQzkl3rDfsXWo8xi2qw",
       "twitter": "https://x.com/ange_katrina_",
+      "twitch": null
+    },
+    "lize-helesta": {
+      "youtube": "https://www.youtube.com/channel/UCZ1xuCK1kNmn5RzPYIZop3w",
+      "twitter": "https://x.com/Lize_Helesta",
       "twitch": null
     },
     "toko-inui": {
@@ -319,7 +319,7 @@
     "ratna-petit": {
       "youtube": "https://www.youtube.com/channel/UCIG9rDtgR45VCZmYnd-4DUw",
       "twitter": "https://x.com/ratna_petit",
-      "twitch": null
+      "twitch": "https://twitch.tv/petit2434"
     },
     "eli-conifer": {
       "youtube": "https://www.youtube.com/channel/UCpNH2Zk2gw3JBjWAKSyZcQQ",
