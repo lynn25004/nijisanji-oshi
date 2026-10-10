@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-10-09",
+  "lastUpdated": "2026-10-10",
   "members": [
     {
       "id": "mito-tsukino",
@@ -1839,23 +1839,23 @@
       "channelUrl": ""
     },
     {
-      "id": "suzuna-nanase",
-      "name": "七瀬すず菜",
-      "nameEn": "Nanase Suzuna",
-      "branch": "JP",
-      "debutDate": "2024-08-12",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/df041caab67b41a0b7539c054e10294a/liver-face_Suzuna_Nanase.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "trout-nagisa",
       "name": "渚トラウト",
       "nameEn": "Nagisa Trout",
       "branch": "JP",
       "debutDate": "2024-08-12",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/03ab673bb8c0400a9fdce1f51755a7e7/liver-face_Trout_Nagisa.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "suzuna-nanase",
+      "name": "七瀬すず菜",
+      "nameEn": "Nanase Suzuna",
+      "branch": "JP",
+      "debutDate": "2024-08-12",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/df041caab67b41a0b7539c054e10294a/liver-face_Suzuna_Nanase.png",
       "active": true,
       "color": "",
       "channelUrl": ""
