@@ -1,6 +1,6 @@
 {
   "_note": "成員生日資料；key 是 members.json 的 id；value 是 MM-DD。",
-  "lastUpdated": "2026-05-18T23:36:18.021952+08:00",
+  "lastUpdated": "2026-10-12T00:24:05.821950+08:00",
   "birthdays": {
     "mito-tsukino": "09-24",
     "elu": "01-24",
@@ -178,6 +178,10 @@
     "ayumu-senri": "01-05",
     "onotora": "08-20",
     "iruka-kokonami": "09-12",
-    "eita-kuri": "12-19"
+    "eita-kuri": "12-19",
+    "purin-lala-mode": "02-25",
+    "pomelo-punch": "11-05",
+    "taiga-kaminaga": "11-22",
+    "ryuichiro-yamada": "07-06"
   }
 }

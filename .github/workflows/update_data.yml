@@ -33,11 +33,16 @@ jobs:
         run: python -u scripts/build_products.py
         timeout-minutes: 30
 
+      - name: 補新成員生日（只抓還沒有的人）
+        run: python -u scripts/build_birthdays.py
+        timeout-minutes: 10
+        continue-on-error: true
+
       - name: 提交更新資料
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Actions"
-          git add data/members.json data/products.json
+          git add data/members.json data/products.json data/birthdays.json
           git diff --staged --quiet || git commit -m "自動更新成員＋商品資料 $(date '+%Y-%m-%d')"
 
       - name: 推送

@@ -5,6 +5,7 @@
 
 支援增量：第二次跑只抓新出現在 sitemap 的商品代碼。
 """
+import html as htmllib
 import json, re, sys, time
 from pathlib import Path
 from datetime import datetime
@@ -79,15 +80,8 @@ def list_sitemap_codes():
 
 
 def decode_html(s: str) -> str:
-    return (
-        s.replace("&amp;", "&")
-        .replace("&lt;", "<")
-        .replace("&gt;", ">")
-        .replace("&quot;", '"')
-        .replace("&#39;", "'")
-        .replace("&#x2F;", "/")
-        .replace("&nbsp;", " ")
-    )
+    # html.unescape 才吃得到 &Delta; 這類具名實體（VΔLZ 曾被存成 V&Delta;LZ）
+    return htmllib.unescape(s).replace("\xa0", " ")
 
 
 def extract_meta(html: str, prop: str):
@@ -128,8 +122,11 @@ def extract_talents_from_liver(html: str):
 
 def extract_unit_tags(html: str):
     tags = set()
+    # 只認商品頁的 class="tag"（＃ROF-MAO 這種）；頁首選單也有 /TAG_ 連結（にじぬい特集…），
+    # 以前整頁掃導致每個商品都被塞進 14 個特集
     for m in re.finditer(
-        r'<a[^>]+href=["\']/TAG_\d+["\'][^>]*>([^<]+)</a>', html
+        r'<a\b(?=[^>]*href=["\']/TAG_\d+["\'])(?=[^>]*class=["\']tag["\'])[^>]*>([^<]+)</a>',
+        html,
     ):
         raw = decode_html(m.group(1)).strip()
         tag = raw.lstrip("＃#").strip()
