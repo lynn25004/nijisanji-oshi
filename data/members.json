@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-10-11",
+  "lastUpdated": "2026-10-12",
   "members": [
     {
       "id": "mito-tsukino",
@@ -1839,23 +1839,23 @@
       "channelUrl": ""
     },
     {
-      "id": "suzuna-nanase",
-      "name": "七瀬すず菜",
-      "nameEn": "Nanase Suzuna",
-      "branch": "JP",
-      "debutDate": "2024-08-12",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/df041caab67b41a0b7539c054e10294a/liver-face_Suzuna_Nanase.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "berry-saotome",
       "name": "早乙女ベリー",
       "nameEn": "Saotome Berry",
       "branch": "JP",
       "debutDate": "2024-08-12",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/712d2034f4d24f29ae34ffaf8b55f46a/liver-face_Berry_Saotome.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "suzuna-nanase",
+      "name": "七瀬すず菜",
+      "nameEn": "Nanase Suzuna",
+      "branch": "JP",
+      "debutDate": "2024-08-12",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/df041caab67b41a0b7539c054e10294a/liver-face_Suzuna_Nanase.png",
       "active": true,
       "color": "",
       "channelUrl": ""
