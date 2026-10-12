@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-10-05T12:15:32+00:00",
+  "lastUpdated": "2026-10-12T13:02:27+00:00",
   "social": {
     "mito-tsukino": {
       "youtube": "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A",
@@ -831,6 +831,11 @@
       "twitter": "https://x.com/KozueMone",
       "twitch": null
     },
+    "berry-saotome": {
+      "youtube": "https://www.youtube.com/channel/UC0xry7czPasj1wPxR8L0MZg",
+      "twitter": "https://x.com/Saotome_Berry",
+      "twitch": null
+    },
     "suzuna-nanase": {
       "youtube": "https://www.youtube.com/channel/UCtC3B1n4XMiJmrDtu1Ni5qw",
       "twitter": "https://x.com/Suzuna_Nanase",
@@ -839,11 +844,6 @@
     "trout-nagisa": {
       "youtube": "https://www.youtube.com/channel/UCpjypWF_wNRs9_TrjjWngpQ",
       "twitter": "https://x.com/Tr0uT_2434",
-      "twitch": null
-    },
-    "berry-saotome": {
-      "youtube": "https://www.youtube.com/channel/UC0xry7czPasj1wPxR8L0MZg",
-      "twitter": "https://x.com/Saotome_Berry",
       "twitch": null
     },
     "soma-sakayori": {
