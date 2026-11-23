@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-11-22",
+  "lastUpdated": "2026-11-23",
   "members": [
     {
       "id": "mito-tsukino",
@@ -1608,23 +1608,23 @@
       "channelUrl": ""
     },
     {
-      "id": "sho-hoshirube",
-      "name": "星導ショウ",
-      "nameEn": "Hoshirube Sho",
-      "branch": "JP",
-      "debutDate": "2023-04-25",
-      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/4b2b45a06a2a49e3b6c6835087ecc1b2/liver-face_Sho_Hoshirube.png",
-      "active": true,
-      "color": "",
-      "channelUrl": ""
-    },
-    {
       "id": "rou-koyanagi",
       "name": "小柳ロウ",
       "nameEn": "Koyanagi Rou",
       "branch": "JP",
       "debutDate": "2023-04-25",
       "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/2222cb2866fe4f3b9c85a45f3689fe53/liver-face_Rou_Koyanagi.png",
+      "active": true,
+      "color": "",
+      "channelUrl": ""
+    },
+    {
+      "id": "sho-hoshirube",
+      "name": "星導ショウ",
+      "nameEn": "Hoshirube Sho",
+      "branch": "JP",
+      "debutDate": "2023-04-25",
+      "image": "https://images.microcms-assets.io/assets/5694fd90407444338a64d654e407cc0e/4b2b45a06a2a49e3b6c6835087ecc1b2/liver-face_Sho_Hoshirube.png",
       "active": true,
       "color": "",
       "channelUrl": ""
