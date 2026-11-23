@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-11-16T13:34:18+00:00",
+  "lastUpdated": "2026-11-23T15:54:45+00:00",
   "social": {
     "mito-tsukino": {
       "youtube": "https://www.youtube.com/channel/UCD-miitqNY3nyukJ4Fnf4_A",
@@ -54,7 +54,7 @@
     "kazaki-morinaka": {
       "youtube": "https://www.youtube.com/channel/UCtpB6Bvhs1Um93ziEDACQ8g",
       "twitter": "https://x.com/KazakiMorinaka",
-      "twitch": "https://twitch.tv/mimoza_ow"
+      "twitch": null
     },
     "mugi-ienaga": {
       "youtube": "https://www.youtube.com/channel/UC_GCs6GARLxEHxy1w40d6VQ",
@@ -951,15 +951,15 @@
       "twitter": "https://x.com/OnoTora333",
       "twitch": "https://twitch.tv/onotora_2434"
     },
-    "ayumu-senri": {
-      "youtube": "https://www.youtube.com/channel/UC5Qv2tPOI38OcnqOdUKkn7Q",
-      "twitter": "https://x.com/Senri_Ayumu",
-      "twitch": "https://twitch.tv/senriayumu_2434"
-    },
     "daichi-tsukahara": {
       "youtube": "https://www.youtube.com/channel/UC9HYkiQZ1_b3J_F8gc12eaA",
       "twitter": "https://x.com/BIG_Tsukahara",
       "twitch": "https://twitch.tv/big_tsukahara"
+    },
+    "ayumu-senri": {
+      "youtube": "https://www.youtube.com/channel/UC5Qv2tPOI38OcnqOdUKkn7Q",
+      "twitter": "https://x.com/Senri_Ayumu",
+      "twitch": "https://twitch.tv/senriayumu_2434"
     },
     "rayon": {
       "youtube": "https://www.youtube.com/channel/UCsxs_R8xnsQN4t-F_3qQ8PQ",
